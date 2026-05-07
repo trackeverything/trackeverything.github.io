@@ -24,24 +24,12 @@
         </div>
     </div>
 
-    <!-- Teaser video -->
+    <!-- Teaser -->
     <div class="section">
         <div class="container">
             <p class="section-intro">
                 <strong>TL;DR:</strong> <span class="highlight-trackeverything">TrackEverything</span> is the first dense 3D point tracker that tracks <em>all</em> points across <em>all</em> frames in long videos (1000+ frames) — outperforming all open-source dense 3D trackers by <strong>over 20% APD</strong> while fitting within <strong>40 GB GPU memory</strong>.
             </p>
-            <div class="video-showcase">
-                <video
-                    class="main-video"
-                    controls
-                    autoplay
-                    loop
-                    muted
-                    style="width: 100%; height: auto; display: block;">
-                    <source src="assets/teaser/teaser.mp4" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-            </div>
         </div>
     </div>
 
@@ -102,12 +90,12 @@
             <div class="viz-grid">
                 <div class="viz-item">
                     <video controls autoplay loop muted playsinline>
-                        <source src="assets/dance-twirl.mp4" type="video/mp4">
+                        <source src="assets/davis_libby_mask.mp4" type="video/mp4">
                     </video>
                 </div>
                 <div class="viz-item">
                     <video controls autoplay loop muted playsinline>
-                        <source src="assets/davis_cow.mp4" type="video/mp4">
+                        <source src="assets/davis-scooter-gray.mp4" type="video/mp4">
                     </video>
                 </div>
                 <div class="viz-item">
@@ -122,17 +110,12 @@
                 </div>
                 <div class="viz-item">
                     <video controls autoplay loop muted playsinline>
-                        <source src="assets/davis_libby_mask.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <div class="viz-item">
-                    <video controls autoplay loop muted playsinline>
-                        <source src="assets/davis-scooter-gray.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <div class="viz-item">
-                    <video controls autoplay loop muted playsinline>
                         <source src="assets/soap-box.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="viz-item">
+                    <video controls autoplay loop muted playsinline>
+                        <source src="assets/davis_cow.mp4" type="video/mp4">
                     </video>
                 </div>
             </div>
@@ -216,119 +199,6 @@
             </p>
         </div>
     </div>
-
-    <!-- Comparisons -->
-    <div class="section">
-        <div class="container">
-            <h2>Qualitative Comparisons</h2>
-            <p class="section-intro">
-                Side-by-side comparisons against leading dense and sparse 3D trackers.
-            </p>
-
-            <div style="display: flex; gap: 2rem; margin-top: 2rem; justify-content: center; max-width: 800px; margin-left: auto; margin-right: auto;">
-                <div style="flex: 0 0 600px;">
-                    <h3 style="text-align: center; margin-bottom: 1rem; color: #667eea;">TrackEverything (Ours)</h3>
-                    <div class="video-viewer-container" style="max-width: 600px; height: 350px;">
-                        <video id="comparison-video-ours" class="main-video" controls autoplay loop muted>
-                            <source src="assets/comparisons/ours_clip_a.webm" type="video/webm">
-                        </video>
-                        <div class="loading-overlay" id="loading-overlay-comparison-ours">
-                            <div class="loading-spinner"></div><p>Loading video...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; margin-top: 2rem; max-width: 800px; margin-left: auto; margin-right: auto;">
-                <div>
-                    <h3 style="text-align: center; margin-bottom: 1rem; color: #f56565;">Any4D (Dense baseline)</h3>
-                    <div class="video-viewer-container" style="max-width: 600px; height: 350px; margin-left: auto; margin-right: auto;">
-                        <video id="comparison-video-baseline1" class="main-video" controls autoplay loop muted>
-                            <source src="assets/comparisons/baseline_a_clip_a.webm" type="video/webm">
-                        </video>
-                        <div class="loading-overlay" id="loading-overlay-comparison-baseline1">
-                            <div class="loading-spinner"></div><p>Loading video...</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <h3 style="text-align: center; margin-bottom: 1rem; color: #f56565;">SpatialTracker-v2 (Sparse baseline)</h3>
-                    <div class="video-viewer-container" style="max-width: 600px; height: 350px; margin-left: auto; margin-right: auto;">
-                        <video id="comparison-video-baseline2" class="main-video" controls autoplay loop muted>
-                            <source src="assets/comparisons/baseline_b_clip_a.webm" type="video/webm">
-                        </video>
-                        <div class="loading-overlay" id="loading-overlay-comparison-baseline2">
-                            <div class="loading-spinner"></div><p>Loading video...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="sequence-thumbnails" style="margin: 2rem auto; justify-content: center; max-width: 800px; grid-template-columns: repeat(4, 1fr);">
-                <div class="thumbnail-item active comparison-thumbnail"
-                     data-ours="assets/comparisons/ours_clip_a.webm"
-                     data-baseline1="assets/comparisons/baseline_a_clip_a.webm"
-                     data-baseline2="assets/comparisons/baseline_b_clip_a.webm">
-                    <p class="thumbnail-label">ADT Clip A</p>
-                </div>
-                <div class="thumbnail-item comparison-thumbnail"
-                     data-ours="assets/comparisons/ours_clip_b.webm"
-                     data-baseline1="assets/comparisons/baseline_a_clip_b.webm"
-                     data-baseline2="assets/comparisons/baseline_b_clip_b.webm">
-                    <p class="thumbnail-label">DriveTrack B</p>
-                </div>
-                <div class="thumbnail-item comparison-thumbnail"
-                     data-ours="assets/comparisons/ours_clip_c.webm"
-                     data-baseline1="assets/comparisons/baseline_a_clip_c.webm"
-                     data-baseline2="assets/comparisons/baseline_b_clip_c.webm">
-                    <p class="thumbnail-label">PStudio C</p>
-                </div>
-                <div class="thumbnail-item comparison-thumbnail"
-                     data-ours="assets/comparisons/ours_clip_d.webm"
-                     data-baseline1="assets/comparisons/baseline_a_clip_d.webm"
-                     data-baseline2="assets/comparisons/baseline_b_clip_d.webm">
-                    <p class="thumbnail-label">Long Video D</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        (function() {
-            const comparisonThumbnails = document.querySelectorAll('.comparison-thumbnail');
-            const videoOurs = document.getElementById('comparison-video-ours');
-            const videoBaseline1 = document.getElementById('comparison-video-baseline1');
-            const videoBaseline2 = document.getElementById('comparison-video-baseline2');
-            const loadingOverlayOurs = document.getElementById('loading-overlay-comparison-ours');
-            const loadingOverlayBaseline1 = document.getElementById('loading-overlay-comparison-baseline1');
-            const loadingOverlayBaseline2 = document.getElementById('loading-overlay-comparison-baseline2');
-
-            function swapVideo(video, overlay, url) {
-                if (!url || !video) return;
-                if (overlay) overlay.style.display = 'flex';
-                video.src = url;
-                video.load();
-                video.onloadeddata = function() {
-                    if (overlay) overlay.style.display = 'none';
-                    video.play();
-                };
-                video.onerror = function() {
-                    if (overlay) overlay.style.display = 'none';
-                };
-            }
-
-            comparisonThumbnails.forEach(function(thumbnail) {
-                thumbnail.onclick = function() {
-                    comparisonThumbnails.forEach(function(t) { t.classList.remove('active'); });
-                    this.classList.add('active');
-                    swapVideo(videoOurs, loadingOverlayOurs, this.getAttribute('data-ours'));
-                    swapVideo(videoBaseline1, loadingOverlayBaseline1, this.getAttribute('data-baseline1'));
-                    swapVideo(videoBaseline2, loadingOverlayBaseline2, this.getAttribute('data-baseline2'));
-                };
-            });
-        })();
-    </script>
 
     <!-- BibTeX -->
     <div class="section">
