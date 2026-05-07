@@ -19,19 +19,6 @@
             <div class="hero-content">
                 <div class="hero-text">
                     <h1><span class="highlight-trackeverything">TrackEverything</span>: Dense 3D Point Tracking in Long Videos via 3D Scene Representations</h1>
-
-                    <div class="authors">
-                        <span style="font-size:1.1rem; color:#555;">Anonymous Author(s)</span><br>
-                        <span class="institution" style="font-size:0.95rem; color:#888;">NeurIPS 2026 Submission</span>
-                    </div>
-
-                    <div class="button-group">
-                        <a href="assets/alltrack3r.pdf" class="btn"><i class="far fa-file-pdf"></i> Paper</a>
-                        <a href="https://arxiv.org/" class="btn"><i class="ai ai-arxiv"></i> arXiv</a>
-                        <a href="https://github.com/" class="btn"><i class="fab fa-github"></i> Code</a>
-                        <a href="https://twitter.com/" class="btn">𝕏 Thread</a>
-                        <a href="#" class="btn">🤗 Demo</a>
-                    </div>
                 </div>
             </div>
         </div>
@@ -108,264 +95,49 @@
         </div>
     </div>
 
-    <!-- Key ideas -->
-    <div class="section">
-        <div class="container">
-            <h2>Key Ideas</h2>
-            <p class="section-intro">TrackEverything rests on three design decisions that together enable scalable, dense, long-video 3D tracking.</p>
-        </div>
-        <div class="key-ideas-grid" style="padding: 0 2rem;">
-            <div class="key-idea-card">
-                <div class="idea-number">01</div>
-                <h3>3D Scene-Content Space</h3>
-                <p>
-                    Rather than tracking in pixel space — where the same surface is re-represented in every frame it appears — we lift
-                    features into world coordinates. Co-located points at a given timestep must correspond to the same surface, so a
-                    voxelized de-duplication at each window boundary collapses redundant observations. The representation grows only
-                    when the camera reveals genuinely new content, not with video length.
-                </p>
-            </div>
-            <div class="key-idea-card">
-                <div class="idea-number">02</div>
-                <h3>Recurrent Sliding-Window Architecture</h3>
-                <p>
-                    A recurrent transformer iteratively refines each point's 3D position using 3D WAFT (Warp-Aligned Feature Transform)
-                    — a feature-warping technique that gives the model an implicit cross-correlation signal without expensive 4D correlation
-                    volumes. Predictions are chained across sliding windows of 16 frames, enabling seamless inference on arbitrarily
-                    long sequences.
-                </p>
-            </div>
-            <div class="key-idea-card">
-                <div class="idea-number">03</div>
-                <h3>Static / Dynamic Classification</h3>
-                <p>
-                    At every window, each point is classified as static or dynamic. Static points — the majority in most scenes — need
-                    no further processing since their trajectories are trivially constant. Only dynamic points are passed to the
-                    trajectory decoder. This classification is re-evaluated each window, so a point can transition from static to dynamic
-                    as motion begins, allocating compute only where it is needed.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Method overview -->
-    <div class="section">
-        <div class="container">
-            <h2>Method Overview</h2>
-            <p class="section-intro">
-                TrackEverything takes a video and 3D pointmaps (from depth sensors or an off-the-shelf estimator such as Pi3) and outputs
-                dense 3D trajectories for all observed points. The pipeline is divided into four stages, run in sliding windows of L=16 frames.
-            </p>
-            <div class="image-showcase">
-                <img src="assets/images/architecture.png" alt="TrackEverything architecture diagram" style="width: 100%; height: auto; display: block;">
-            </div>
-            <div style="max-width: 900px; margin: 1.5rem auto 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem;">
-                <div class="feature-card">
-                    <h3>§3.1 — Encoding</h3>
-                    <p>Each frame is encoded by a frozen DINOv3-small backbone + trainable DPT head, yielding a feature map that is lifted into a world-coordinate feature cloud via the 3D pointmap. Per-frame voxelization merges spatially co-located tokens to avoid erroneous cross-surface merges.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>§3.2 — Iterative Refinement Transformer</h3>
-                    <p>A recurrent transformer with N<sub>attn</sub> self-attention layers iteratively refines each point's 3D target position, visibility, and static/dynamic label. Before each pass, 3D WAFT samples image features at the current position estimate and birth location, providing an implicit cross-correlation signal.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>§3.3 — Trajectory Decoder</h3>
-                    <p>Dynamic points are decoded into full L-frame trajectories via alternating within-track temporal self-attention and cross-attention from a [CLS] token to the feature cloud. Tracks are decoded independently, preventing distribution shift between training (random subset) and test (all tracks).</p>
-                </div>
-                <div class="feature-card">
-                    <h3>§3.4 — Sliding Window Inference</h3>
-                    <p>At each window boundary, the feature cloud is voxelized at the predicted target positions to merge spatially co-located points across frames — safe here because all points are at the same timestep. The deduplicated cloud is concatenated with newly observed points and fed into the next window.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Visualizations -->
     <div class="section">
         <div class="container">
             <h2>Visualizations</h2>
-            <p class="section-intro">
-                Browse dense 3D point tracks and scene flow, or open the <strong>Rerun web viewer</strong> for interactive 3D inspection.
-                Select a scene below to swap the clip or recording.
-            </p>
-
-            <div class="viz-toggle-container">
-                <button class="viz-toggle-btn active" data-viz-type="tracks">
-                   3D Point Tracks
-                </button>
-                <button class="viz-toggle-btn" data-viz-type="flow">
-                    Dense Scene Flow
-                </button>
-                <button class="viz-toggle-btn" data-viz-type="rerun">
-                    Interactive Viewer (Rerun)
-                </button>
-            </div>
-
-            <div class="video-viewer-container" id="main-viewer-container">
-                <video
-                    id="main-video"
-                    class="main-video"
-                    controls
-                    autoplay
-                    loop
-                    muted
-                    style="display: block;">
-                    <source src="assets/videos/tracks_scene01.webm" type="video/webm">
-                    Your browser does not support the video tag.
-                </video>
-
-                <div id="rerun-container" style="display: none; width: 100%; height: 100%;">
-                    <iframe
-                        id="rerun-viewer"
-                        class="main-video"
-                        style="border: none; width: 100%; height: 100%;"
-                        src="https://app.rerun.io/version/0.31.4/index.html?url=https%3A%2F%2Fapp.rerun.io%2Fversion%2F0.31.4%2Fexamples%2Fdna.rrd"
-                        title="Rerun 3D Viewer"
-                        allowfullscreen>
-                    </iframe>
+            <div class="viz-grid">
+                <div class="viz-item">
+                    <video controls autoplay loop muted playsinline>
+                        <source src="assets/dance-twirl.mp4" type="video/mp4">
+                    </video>
                 </div>
-
-                <div class="loading-overlay" id="loading-overlay">
-                    <div class="loading-spinner"></div>
-                    <p>Loading...</p>
+                <div class="viz-item">
+                    <video controls autoplay loop muted playsinline>
+                        <source src="assets/davis_cow.mp4" type="video/mp4">
+                    </video>
                 </div>
-            </div>
-
-            <div class="sequence-thumbnails" id="thumbnail-container">
-                <div class="thumbnail-item active"
-                     data-video-tracks="assets/videos/tracks_scene01.webm"
-                     data-video-flow="assets/videos/flow_scene01.webm"
-                     data-rerun-url="https://app.rerun.io/version/0.31.4/examples/dna.rrd">
-                    <p class="thumbnail-label">ADT — Clip 1</p>
+                <div class="viz-item">
+                    <video controls autoplay loop muted playsinline>
+                        <source src="assets/davis_dance-twirl.mp4" type="video/mp4">
+                    </video>
                 </div>
-                <div class="thumbnail-item"
-                     data-video-tracks="assets/videos/tracks_scene02.webm"
-                     data-video-flow="assets/videos/flow_scene02.webm"
-                     data-rerun-url="https://app.rerun.io/version/0.31.4/examples/dna.rrd">
-                    <p class="thumbnail-label">ADT — Clip 2</p>
+                <div class="viz-item">
+                    <video controls autoplay loop muted playsinline>
+                        <source src="assets/davis-drive-chicane.mp4" type="video/mp4">
+                    </video>
                 </div>
-                <div class="thumbnail-item"
-                     data-video-tracks="assets/videos/tracks_scene03.webm"
-                     data-video-flow="assets/videos/flow_scene03.webm"
-                     data-rerun-url="https://app.rerun.io/version/0.31.4/examples/dna.rrd">
-                    <p class="thumbnail-label">DriveTrack — Clip 1</p>
+                <div class="viz-item">
+                    <video controls autoplay loop muted playsinline>
+                        <source src="assets/davis_libby_mask.mp4" type="video/mp4">
+                    </video>
                 </div>
-                <div class="thumbnail-item"
-                     data-video-tracks="assets/videos/tracks_scene04.webm"
-                     data-video-flow="assets/videos/flow_scene04.webm"
-                     data-rerun-url="https://app.rerun.io/version/0.31.4/examples/dna.rrd">
-                    <p class="thumbnail-label">DriveTrack — Clip 2</p>
+                <div class="viz-item">
+                    <video controls autoplay loop muted playsinline>
+                        <source src="assets/davis-scooter-gray.mp4" type="video/mp4">
+                    </video>
                 </div>
-                <div class="thumbnail-item"
-                     data-video-tracks="assets/videos/tracks_scene05.webm"
-                     data-video-flow="assets/videos/flow_scene05.webm"
-                     data-rerun-url="https://app.rerun.io/version/0.31.4/examples/dna.rrd">
-                    <p class="thumbnail-label">PStudio — Clip 1</p>
-                </div>
-                <div class="thumbnail-item"
-                     data-video-tracks="assets/videos/tracks_scene06.webm"
-                     data-video-flow="assets/videos/flow_scene06.webm"
-                     data-rerun-url="https://app.rerun.io/version/0.31.4/examples/dna.rrd">
-                    <p class="thumbnail-label">PStudio — Clip 2</p>
-                </div>
-                <div class="thumbnail-item"
-                     data-video-tracks="assets/videos/tracks_scene07.webm"
-                     data-video-flow="assets/videos/flow_scene07.webm"
-                     data-rerun-url="https://app.rerun.io/version/0.31.4/examples/dna.rrd">
-                    <p class="thumbnail-label">Long Video (500 fr)</p>
-                </div>
-                <div class="thumbnail-item"
-                     data-video-tracks="assets/videos/tracks_scene08.webm"
-                     data-video-flow="assets/videos/flow_scene08.webm"
-                     data-rerun-url="https://app.rerun.io/version/0.31.4/examples/dna.rrd">
-                    <p class="thumbnail-label">Long Video (1000 fr)</p>
+                <div class="viz-item">
+                    <video controls autoplay loop muted playsinline>
+                        <source src="assets/soap-box.mp4" type="video/mp4">
+                    </video>
                 </div>
             </div>
         </div>
     </div>
-
-    <script>
-        (function() {
-            const RERUN_VIEWER_TEMPLATE = 'https://app.rerun.io/version/0.31.4/index.html?url=';
-
-            const thumbnails = document.querySelectorAll('#thumbnail-container .thumbnail-item');
-            const mainVideo = document.getElementById('main-video');
-            const rerunContainer = document.getElementById('rerun-container');
-            const loadingOverlay = document.getElementById('loading-overlay');
-            const vizToggleBtns = document.querySelectorAll('.viz-toggle-btn');
-
-            let currentVizType = 'tracks';
-            let currentRerunIframe = document.getElementById('rerun-viewer');
-
-            function rerunSrcForRrd(rrdUrl) {
-                return RERUN_VIEWER_TEMPLATE + encodeURIComponent(rrdUrl);
-            }
-
-            function loadContent(thumbnail) {
-                if (loadingOverlay) loadingOverlay.style.display = 'flex';
-
-                if (currentVizType === 'rerun') {
-                    mainVideo.style.display = 'none';
-                    rerunContainer.style.display = 'block';
-
-                    const rrdUrl = thumbnail.getAttribute('data-rerun-url');
-                    if (rrdUrl && currentRerunIframe) {
-                        currentRerunIframe.remove();
-                        currentRerunIframe = document.createElement('iframe');
-                        currentRerunIframe.id = 'rerun-viewer';
-                        currentRerunIframe.className = 'main-video';
-                        currentRerunIframe.title = 'Rerun 3D Viewer';
-                        currentRerunIframe.allowFullscreen = true;
-                        currentRerunIframe.style.border = 'none';
-                        currentRerunIframe.style.width = '100%';
-                        currentRerunIframe.style.height = '100%';
-                        currentRerunIframe.src = rerunSrcForRrd(rrdUrl);
-                        rerunContainer.appendChild(currentRerunIframe);
-                        setTimeout(function() {
-                            if (loadingOverlay) loadingOverlay.style.display = 'none';
-                        }, 3000);
-                    }
-                } else {
-                    rerunContainer.style.display = 'none';
-                    mainVideo.style.display = 'block';
-
-                    const videoUrl = currentVizType === 'tracks'
-                        ? thumbnail.getAttribute('data-video-tracks')
-                        : thumbnail.getAttribute('data-video-flow');
-
-                    if (videoUrl && mainVideo) {
-                        mainVideo.src = videoUrl;
-                        mainVideo.load();
-                        mainVideo.onloadeddata = function() {
-                            if (loadingOverlay) loadingOverlay.style.display = 'none';
-                            mainVideo.play();
-                        };
-                        mainVideo.onerror = function() {
-                            if (loadingOverlay) loadingOverlay.style.display = 'none';
-                        };
-                    }
-                }
-            }
-
-            thumbnails.forEach(function(thumbnail) {
-                thumbnail.onclick = function() {
-                    thumbnails.forEach(function(t) { t.classList.remove('active'); });
-                    this.classList.add('active');
-                    loadContent(this);
-                };
-            });
-
-            vizToggleBtns.forEach(function(btn) {
-                btn.onclick = function() {
-                    vizToggleBtns.forEach(function(b) { b.classList.remove('active'); });
-                    this.classList.add('active');
-                    currentVizType = this.getAttribute('data-viz-type');
-                    const activeThumb = document.querySelector('#thumbnail-container .thumbnail-item.active');
-                    if (activeThumb) loadContent(activeThumb);
-                };
-            });
-        })();
-    </script>
 
     <!-- Quantitative results -->
     <div class="section">
@@ -558,59 +330,6 @@
         })();
     </script>
 
-    <!-- Scaling analysis -->
-    <div class="section">
-        <div class="container">
-            <h2>Scaling Analysis</h2>
-            <p class="section-intro">
-                Peak GPU memory and latency as a function of video length and number of query points on PointOdyssey (single L40S-46G GPU).
-                TrackEverything is the only method that tracks all points <em>densely</em> while staying under 30 GB at 900 frames.
-            </p>
-            <div class="image-showcase">
-                <img src="assets/images/supplementary.png" alt="TrackEverything scaling analysis" style="width: 100%; height: auto; display: block;">
-            </div>
-            <div style="max-width: 900px; margin: 1.5rem auto 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center;">
-                <div class="feature-card">
-                    <h3>Video Length Scaling</h3>
-                    <p>Any4D goes OOM at 96 frames. SpatialTracker-v2 at ~200 frames. CoTracker3 at ~600 frames. <strong>TrackEverything stays under 30 GB at 900+ frames.</strong></p>
-                </div>
-                <div class="feature-card">
-                    <h3>Query Point Scaling</h3>
-                    <p>CoTracker3 latency surpasses ours at ~2,000 query points. SpatialTracker-v2 exceeds memory at 1,000 points. <strong>TrackEverything maintains near-constant latency up to 10,000 query points.</strong></p>
-                </div>
-                <div class="feature-card">
-                    <h3>Why the Efficiency?</h3>
-                    <p>Three factors: (i) voxelized de-duplication of redundant 3D points, (ii) 3D WAFT in place of expensive 4D correlation volumes, (iii) sliding-window inference with O(scene content) complexity.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Limitations -->
-    <div class="section">
-        <div class="container">
-            <h2>Limitations</h2>
-            <p class="section-intro">
-                TrackEverything demonstrates strong performance, but several limitations remain open for future work.
-            </p>
-
-            <div class="feature-grid" style="margin-top: 2rem;">
-                <div class="feature-card">
-                    <h3>Model Scale & Data</h3>
-                    <p>Due to compute constraints, TrackEverything has not been scaled beyond 61M parameters nor trained on larger, more diverse datasets. Scaling both axes is likely to yield further gains, particularly on complex real-world scenes.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>Unbounded Memory Growth</h3>
-                    <p>The current design retains all observed points indefinitely. Although voxelized de-duplication controls redundancy per window, memory will eventually become a bottleneck for very long videos (e.g., hours of footage). A dynamic eviction-and-retrieval strategy is needed for truly arbitrarily long sequences.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>Reliance on External Geometry</h3>
-                    <p>TrackEverything relies on 3D pointmaps from an external estimator (e.g., Pi3) rather than predicting geometry end-to-end. While the architecture can in principle subsume geometry estimation, this direction requires substantially more training data and compute, which we leave to future work.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- BibTeX -->
     <div class="section">
         <div class="container">
@@ -621,7 +340,6 @@
             <div class="citation-box" style="margin-top: 1rem;">
 <pre><code>@inproceedings{trackeverything2026,
   title     = {TrackEverything: Dense 3D Point Tracking in Long Videos via 3D Scene Representations},
-  author    = {Anonymous Author(s)},
   booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
   year      = {2026},
 }</code></pre>
@@ -635,8 +353,7 @@
             <h2>Acknowledgements</h2>
             <p class="section-intro">
                 We thank the authors of Pi3, TAPIP-3D, SpatialTracker-v2, Any4D, CoTracker3, and WAFT for releasing code and models,
-                and the TAPVid-3D team for the benchmark. Interactive visualizations are powered by
-                <a href="https://rerun.io" class="author-link">Rerun</a>.
+                and the TAPVid-3D team for the benchmark.
             </p>
         </div>
     </div>
