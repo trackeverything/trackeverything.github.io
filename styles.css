@@ -806,7 +806,7 @@ footer {
     flex-direction: column;
     gap: 3rem;
     margin: 2.5rem auto 0;
-    max-width: 1200px;
+    max-width: 900px;
     width: 100%;
 }
 
