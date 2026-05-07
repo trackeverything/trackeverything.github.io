@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TrackEverything — Dense 3D Point Tracking in Long Videos via 3D Scene Representations">
+    <meta name="keywords" content="TrackEverything, dense tracking, 3D point tracking, long video, scene representation, voxelization, TAPVid-3D">
+    <title>TrackEverything — Dense 3D Point Tracking in Long Videos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1><span class="highlight-trackeverything">TrackEverything</span>: Dense 3D Point Tracking in Long Videos via 3D Scene Representations</h1>
+
+                    <div class="authors">
+                        <!-- AllTrack3r: Representing videos as persistent 4D Point Tracks -->
+<!-- Ayush Jain, Sreeharsha Paruchuri, Ishita Gupta, Fan Zhang, Tanner Schmidt, Jakob Engel, Katerina Fragkiadaki, Adam W Harley -->
+                        <a href="" class="author-link"><b>Ayush Jain</b></a>,
+                        <a href="" class="author-link"><b>Sreeharsha Paruchuri</b></a>,
+                        <a href="" class="author-link"><b>Ishita Gupta</b></a>,
+                        <a href="" class="author-link"><b>Fan Zhang</b></a>,
+                        <a href="" class="author-link"><b>Tanner Schmidt</b></a>,
+                        <a href="" class="author-link"><b>Jakob Engel</b></a>,
+                        <a href="" class="author-link"><b>Katerina Fragkiadaki</b></a>,
+                        <a href="" class="author-link"><b>Adam W Harley</b></a><br>
+                        <span class="institution">Carnegie Mellon University</span><br>
+                        <span class="institution" style="font-size:0.95rem; color:#888;">NeurIPS 2026 Submission</span>
+                    </div>
+
+                    <div class="button-group">
+                        <a href="assets/alltrack3r.pdf" class="btn"><i class="far fa-file-pdf"></i> Paper</a>
+                        <a href="https://arxiv.org/" class="btn"><i class="ai ai-arxiv"></i> arXiv</a>
+                        <a href="https://github.com/" class="btn"><i class="fab fa-github"></i> Code</a>
+                        <a href="https://twitter.com/" class="btn">𝕏 Thread</a>
+                        <a href="#" class="btn">🤗 Demo</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teaser video -->
+    <div class="section">
+        <div class="container">
+            <p class="section-intro">
+                <strong>TL;DR:</strong> <span class="highlight-trackeverything">TrackEverything</span> is the first dense 3D point tracker that tracks <em>all</em> points across <em>all</em> frames in long videos (1000+ frames) — outperforming all open-source dense 3D trackers by <strong>over 20% APD</strong> while fitting within <strong>40 GB GPU memory</strong>.
+            </p>
+            <div class="video-showcase">
+                <video
+                    class="main-video"
+                    controls
+                    autoplay
+                    loop
+                    muted
+                    style="width: 100%; height: auto; display: block;">
+                    <source src="assets/teaser/teaser.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key stats -->
+    <div class="section">
+        <div class="container">
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-number">+20%</div>
+                    <div class="stat-label">APD over all open-source<br>dense 3D trackers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">1000+</div>
+                    <div class="stat-label">frames — dense tracking<br>on full-length sequences</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">&lt;40 GB</div>
+                    <div class="stat-label">peak GPU memory<br>at 1000+ frames</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">61M</div>
+                    <div class="stat-label">parameters — fraction of<br>prior SOTA model count</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Abstract -->
+    <div class="section">
+        <div class="container">
+            <h2>Abstract</h2>
+            <div class="section-intro text-justified">
+                <p style="margin-bottom: 1.5rem;">
+                    Videos are 2D projections of a persistent 3D world, yet most tracking methods operate in pixel space, redundantly
+                    re-representing the same surfaces across frames. This limits them to either tracking a sparse set of query points or
+                    tracking densely but only over short clips. We introduce <strong>TrackEverything</strong>, a dense 3D point tracker that represents
+                    videos as persistent 3D scene tracks in world coordinates. Our approach combines three ideas:
+                    (1) tracking in 3D scene-content space, where repeated observations of the same surface are fused and occluded points
+                    persist without redundant representation;
+                    (2) a recurrent architecture that iteratively refines motion estimates and chains predictions across sliding windows
+                    for long-video inference; and
+                    (3) per-window static/dynamic classification that allocates trajectory decoding only to points in motion, saving
+                    computation on the majority of static scene content. At each window boundary, the 3D representation is voxelized
+                    to remove redundant points, ensuring that model complexity scales with the amount of distinct scene content rather
+                    than video length. To the best of our knowledge, TrackEverything is the first dense 3D point tracker that can track
+                    all points across all frames in long videos (1000+ frames). On TAPVid-3D, TrackEverything outperforms all open-source
+                    dense 3D trackers by over 20% APD on short clips and is the only dense method that scales to full-length sequences,
+                    where it remains competitive with state-of-the-art sparse 3D trackers despite tracking orders of magnitude more points.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key ideas -->
+    <div class="section">
+        <div class="container">
+            <h2>Key Ideas</h2>
+            <p class="section-intro">TrackEverything rests on three design decisions that together enable scalable, dense, long-video 3D tracking.</p>
+        </div>
+        <div class="key-ideas-grid" style="padding: 0 2rem;">
+            <div class="key-idea-card">
+                <div class="idea-number">01</div>
+                <h3>3D Scene-Content Space</h3>
+                <p>
+                    Rather than tracking in pixel space — where the same surface is re-represented in every frame it appears — we lift
+                    features into world coordinates. Co-located points at a given timestep must correspond to the same surface, so a
+                    voxelized de-duplication at each window boundary collapses redundant observations. The representation grows only
+                    when the camera reveals genuinely new content, not with video length.
+                </p>
+            </div>
+            <div class="key-idea-card">
+                <div class="idea-number">02</div>
+                <h3>Recurrent Sliding-Window Architecture</h3>
+                <p>
+                    A recurrent transformer iteratively refines each point's 3D position using 3D WAFT (Warp-Aligned Feature Transform)
+                    — a feature-warping technique that gives the model an implicit cross-correlation signal without expensive 4D correlation
+                    volumes. Predictions are chained across sliding windows of 16 frames, enabling seamless inference on arbitrarily
+                    long sequences.
+                </p>
+            </div>
+            <div class="key-idea-card">
+                <div class="idea-number">03</div>
+                <h3>Static / Dynamic Classification</h3>
+                <p>
+                    At every window, each point is classified as static or dynamic. Static points — the majority in most scenes — need
+                    no further processing since their trajectories are trivially constant. Only dynamic points are passed to the
+                    trajectory decoder. This classification is re-evaluated each window, so a point can transition from static to dynamic
+                    as motion begins, allocating compute only where it is needed.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Method overview -->
+    <div class="section">
+        <div class="container">
+            <h2>Method Overview</h2>
+            <p class="section-intro">
+                TrackEverything takes a video and 3D pointmaps (from depth sensors or an off-the-shelf estimator such as Pi3) and outputs
+                dense 3D trajectories for all observed points. The pipeline is divided into four stages, run in sliding windows of L=16 frames.
+            </p>
+            <div class="image-showcase">
+                <img src="assets/images/architecture.png" alt="TrackEverything architecture diagram" style="width: 100%; height: auto; display: block;">
+            </div>
+            <div style="max-width: 900px; margin: 1.5rem auto 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem;">
+                <div class="feature-card">
+                    <h3>§3.1 — Encoding</h3>
+                    <p>Each frame is encoded by a frozen DINOv3-small backbone + trainable DPT head, yielding a feature map that is lifted into a world-coordinate feature cloud via the 3D pointmap. Per-frame voxelization merges spatially co-located tokens to avoid erroneous cross-surface merges.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>§3.2 — Iterative Refinement Transformer</h3>
+                    <p>A recurrent transformer with N<sub>attn</sub> self-attention layers iteratively refines each point's 3D target position, visibility, and static/dynamic label. Before each pass, 3D WAFT samples image features at the current position estimate and birth location, providing an implicit cross-correlation signal.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>§3.3 — Trajectory Decoder</h3>
+                    <p>Dynamic points are decoded into full L-frame trajectories via alternating within-track temporal self-attention and cross-attention from a [CLS] token to the feature cloud. Tracks are decoded independently, preventing distribution shift between training (random subset) and test (all tracks).</p>
+                </div>
+                <div class="feature-card">
+                    <h3>§3.4 — Sliding Window Inference</h3>
+                    <p>At each window boundary, the feature cloud is voxelized at the predicted target positions to merge spatially co-located points across frames — safe here because all points are at the same timestep. The deduplicated cloud is concatenated with newly observed points and fed into the next window.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visualizations -->
+    <div class="section">
+        <div class="container">
+            <h2>Visualizations</h2>
+            <p class="section-intro">
+                Browse dense 3D point tracks and scene flow, or open the <strong>Rerun web viewer</strong> for interactive 3D inspection.
+                Select a scene below to swap the clip or recording.
+            </p>
+
+            <div class="viz-toggle-container">
+                <button class="viz-toggle-btn active" data-viz-type="tracks">
+                   3D Point Tracks
+                </button>
+                <button class="viz-toggle-btn" data-viz-type="flow">
+                    Dense Scene Flow
+                </button>
+                <button class="viz-toggle-btn" data-viz-type="rerun">
+                    Interactive Viewer (Rerun)
+                </button>
+            </div>
+
+            <div class="video-viewer-container" id="main-viewer-container">
+                <video
+                    id="main-video"
+                    class="main-video"
+                    controls
+                    autoplay
+                    loop
+                    muted
+                    style="display: block;">
+                    <source src="assets/videos/tracks_scene01.webm" type="video/webm">
+                    Your browser does not support the video tag.
+                </video>
+
+                <div id="rerun-container" style="display: none; width: 100%; height: 100%;">
+                    <iframe
+                        id="rerun-viewer"
+                        class="main-video"
+                        style="border: none; width: 100%; height: 100%;"
+                        src="https://app.rerun.io/version/0.31.4/index.html?url=https%3A%2F%2Fapp.rerun.io%2Fversion%2F0.31.4%2Fexamples%2Fdna.rrd"
+                        title="Rerun 3D Viewer"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+
+                <div class="loading-overlay" id="loading-overlay">
+                    <div class="loading-spinner"></div>
+                    <p>Loading...</p>
+                </div>
+            </div>
+
+            <div class="sequence-thumbnails" id="thumbnail-container">
+                <div class="thumbnail-item active"
+                     data-video-tracks="assets/videos/tracks_scene01.webm"
+                     data-video-flow="assets/videos/flow_scene01.webm"
+                     data-rerun-url="https://app.rerun.io/version/0.31.4/examples/dna.rrd">
+                    <p class="thumbnail-label">ADT — Clip 1</p>
+                </div>
+                <div class="thumbnail-item"
+                     data-video-tracks="assets/videos/tracks_scene02.webm"
+                     data-video-flow="assets/videos/flow_scene02.webm"
+                     data-rerun-url="https://app.rerun.io/version/0.31.4/examples/dna.rrd">
+                    <p class="thumbnail-label">ADT — Clip 2</p>
+                </div>
+                <div class="thumbnail-item"
+                     data-video-tracks="assets/videos/tracks_scene03.webm"
+                     data-video-flow="assets/videos/flow_scene03.webm"
+                     data-rerun-url="https://app.rerun.io/version/0.31.4/examples/dna.rrd">
+                    <p class="thumbnail-label">DriveTrack — Clip 1</p>
+                </div>
+                <div class="thumbnail-item"
+                     data-video-tracks="assets/videos/tracks_scene04.webm"
+                     data-video-flow="assets/videos/flow_scene04.webm"
+                     data-rerun-url="https://app.rerun.io/version/0.31.4/examples/dna.rrd">
+                    <p class="thumbnail-label">DriveTrack — Clip 2</p>
+                </div>
+                <div class="thumbnail-item"
+                     data-video-tracks="assets/videos/tracks_scene05.webm"
+                     data-video-flow="assets/videos/flow_scene05.webm"
+                     data-rerun-url="https://app.rerun.io/version/0.31.4/examples/dna.rrd">
+                    <p class="thumbnail-label">PStudio — Clip 1</p>
+                </div>
+                <div class="thumbnail-item"
+                     data-video-tracks="assets/videos/tracks_scene06.webm"
+                     data-video-flow="assets/videos/flow_scene06.webm"
+                     data-rerun-url="https://app.rerun.io/version/0.31.4/examples/dna.rrd">
+                    <p class="thumbnail-label">PStudio — Clip 2</p>
+                </div>
+                <div class="thumbnail-item"
+                     data-video-tracks="assets/videos/tracks_scene07.webm"
+                     data-video-flow="assets/videos/flow_scene07.webm"
+                     data-rerun-url="https://app.rerun.io/version/0.31.4/examples/dna.rrd">
+                    <p class="thumbnail-label">Long Video (500 fr)</p>
+                </div>
+                <div class="thumbnail-item"
+                     data-video-tracks="assets/videos/tracks_scene08.webm"
+                     data-video-flow="assets/videos/flow_scene08.webm"
+                     data-rerun-url="https://app.rerun.io/version/0.31.4/examples/dna.rrd">
+                    <p class="thumbnail-label">Long Video (1000 fr)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const RERUN_VIEWER_TEMPLATE = 'https://app.rerun.io/version/0.31.4/index.html?url=';
+
+            const thumbnails = document.querySelectorAll('#thumbnail-container .thumbnail-item');
+            const mainVideo = document.getElementById('main-video');
+            const rerunContainer = document.getElementById('rerun-container');
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const vizToggleBtns = document.querySelectorAll('.viz-toggle-btn');
+
+            let currentVizType = 'tracks';
+            let currentRerunIframe = document.getElementById('rerun-viewer');
+
+            function rerunSrcForRrd(rrdUrl) {
+                return RERUN_VIEWER_TEMPLATE + encodeURIComponent(rrdUrl);
+            }
+
+            function loadContent(thumbnail) {
+                if (loadingOverlay) loadingOverlay.style.display = 'flex';
+
+                if (currentVizType === 'rerun') {
+                    mainVideo.style.display = 'none';
+                    rerunContainer.style.display = 'block';
+
+                    const rrdUrl = thumbnail.getAttribute('data-rerun-url');
+                    if (rrdUrl && currentRerunIframe) {
+                        currentRerunIframe.remove();
+                        currentRerunIframe = document.createElement('iframe');
+                        currentRerunIframe.id = 'rerun-viewer';
+                        currentRerunIframe.className = 'main-video';
+                        currentRerunIframe.title = 'Rerun 3D Viewer';
+                        currentRerunIframe.allowFullscreen = true;
+                        currentRerunIframe.style.border = 'none';
+                        currentRerunIframe.style.width = '100%';
+                        currentRerunIframe.style.height = '100%';
+                        currentRerunIframe.src = rerunSrcForRrd(rrdUrl);
+                        rerunContainer.appendChild(currentRerunIframe);
+                        setTimeout(function() {
+                            if (loadingOverlay) loadingOverlay.style.display = 'none';
+                        }, 3000);
+                    }
+                } else {
+                    rerunContainer.style.display = 'none';
+                    mainVideo.style.display = 'block';
+
+                    const videoUrl = currentVizType === 'tracks'
+                        ? thumbnail.getAttribute('data-video-tracks')
+                        : thumbnail.getAttribute('data-video-flow');
+
+                    if (videoUrl && mainVideo) {
+                        mainVideo.src = videoUrl;
+                        mainVideo.load();
+                        mainVideo.onloadeddata = function() {
+                            if (loadingOverlay) loadingOverlay.style.display = 'none';
+                            mainVideo.play();
+                        };
+                        mainVideo.onerror = function() {
+                            if (loadingOverlay) loadingOverlay.style.display = 'none';
+                        };
+                    }
+                }
+            }
+
+            thumbnails.forEach(function(thumbnail) {
+                thumbnail.onclick = function() {
+                    thumbnails.forEach(function(t) { t.classList.remove('active'); });
+                    this.classList.add('active');
+                    loadContent(this);
+                };
+            });
+
+            vizToggleBtns.forEach(function(btn) {
+                btn.onclick = function() {
+                    vizToggleBtns.forEach(function(b) { b.classList.remove('active'); });
+                    this.classList.add('active');
+                    currentVizType = this.getAttribute('data-viz-type');
+                    const activeThumb = document.querySelector('#thumbnail-container .thumbnail-item.active');
+                    if (activeThumb) loadContent(activeThumb);
+                };
+            });
+        })();
+    </script>
+
+    <!-- Quantitative results -->
+    <div class="section">
+        <div class="container">
+            <h2>Quantitative Results</h2>
+            <p class="section-intro">
+                TAPVid-3D evaluation across three datasets in the <em>first 48 frames</em> (short clips, aligned with prior dense methods)
+                and <em>full-length video</em> regimes. TrackEverything is the only dense method that runs on full-length sequences.
+                All methods use Pi3 geometry where supported. Bold = best open dense method per column.
+            </p>
+            <div class="results-table-wrapper">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" style="text-align:left; padding-left:1rem;">Method</th>
+                            <th colspan="6" class="group-header">First 48 Frames</th>
+                            <th colspan="6" class="group-header">Full-Length Video</th>
+                        </tr>
+                        <tr>
+                            <th>ADT<br><small>APD-P</small></th>
+                            <th>ADT<br><small>APD-M</small></th>
+                            <th>DriveTrk<br><small>APD-P</small></th>
+                            <th>DriveTrk<br><small>APD-M</small></th>
+                            <th>PStudio<br><small>APD-P</small></th>
+                            <th>PStudio<br><small>APD-M</small></th>
+                            <th>ADT<br><small>APD-P</small></th>
+                            <th>ADT<br><small>APD-M</small></th>
+                            <th>DriveTrk<br><small>APD-P</small></th>
+                            <th>DriveTrk<br><small>APD-M</small></th>
+                            <th>PStudio<br><small>APD-P</small></th>
+                            <th>PStudio<br><small>APD-M</small></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="section-header">
+                            <td colspan="13">Sparse Tracking Baselines</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left; padding-left:1.5rem;">CoTracker3 + Pi3</td>
+                            <td>38.7</td><td>88.0</td><td>29.2</td><td>41.9</td><td>23.7</td><td>83.1</td>
+                            <td>31.4</td><td>82.3</td><td>24.3</td><td>40.5</td><td>18.7</td><td>80.2</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left; padding-left:1.5rem;">SpatialTracker-v2 + Pi3</td>
+                            <td>39.9</td><td>88.1</td><td>29.8</td><td>42.5</td><td>20.6</td><td>80.7</td>
+                            <td>32.1</td><td>82.4</td><td>26.2</td><td>43.5</td><td>17.2</td><td>78.5</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left; padding-left:1.5rem;">TAPIP-3D + Pi3</td>
+                            <td>39.6</td><td>88.5</td><td>28.5</td><td>41.0</td><td>23.9</td><td>83.4</td>
+                            <td>32.7</td><td>82.0</td><td>25.0</td><td>40.9</td><td>19.1</td><td>80.7</td>
+                        </tr>
+                        <tr class="section-header">
+                            <td colspan="13">Dense Tracking Baselines</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left; padding-left:1.5rem;">Any4D + Pi3</td>
+                            <td>5.1</td><td>61.5</td><td>2.6</td><td>5.4</td><td>4.2</td><td>66.0</td>
+                            <td colspan="6" style="color:#aaa;">N/A (OOM)</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left; padding-left:1.5rem;">VDPM</td>
+                            <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
+                            <td colspan="6" style="color:#aaa;">N/A</td>
+                        </tr>
+                        <tr class="ours">
+                            <td style="text-align:left; padding-left:1.5rem;">TrackEverything (Ours)</td>
+                            <td class="bold">40.0</td><td class="bold">89.1</td><td class="bold">26.7</td><td class="bold">38.8</td><td class="bold">22.7</td><td class="bold">83.4</td>
+                            <td class="bold">30.5</td><td class="bold">81.6</td><td class="bold">23.7</td><td class="bold">39.6</td><td class="bold">17.8</td><td class="bold">80.4</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="section-intro" style="font-size:0.88rem; color:#777; margin-top:0.75rem;">
+                D4RT (closed-source, 1B parameters, undisclosed data) achieves higher APD-P on 48-frame clips but has not been evaluated beyond 48 frames. TrackEverything uses 61M parameters trained on publicly available datasets only.
+            </p>
+        </div>
+    </div>
+
+    <!-- Comparisons -->
+    <div class="section">
+        <div class="container">
+            <h2>Qualitative Comparisons</h2>
+            <p class="section-intro">
+                Side-by-side comparisons against leading dense and sparse 3D trackers.
+            </p>
+
+            <div style="display: flex; gap: 2rem; margin-top: 2rem; justify-content: center; max-width: 1200px; margin-left: auto; margin-right: auto;">
+                <div style="flex: 0 0 600px;">
+                    <h3 style="text-align: center; margin-bottom: 1rem; color: #667eea;">TrackEverything (Ours)</h3>
+                    <div class="video-viewer-container" style="max-width: 600px; height: 350px;">
+                        <video id="comparison-video-ours" class="main-video" controls autoplay loop muted>
+                            <source src="assets/comparisons/ours_clip_a.webm" type="video/webm">
+                        </video>
+                        <div class="loading-overlay" id="loading-overlay-comparison-ours">
+                            <div class="loading-spinner"></div><p>Loading video...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; margin-top: 2rem; max-width: 1200px; margin-left: auto; margin-right: auto;">
+                <div>
+                    <h3 style="text-align: center; margin-bottom: 1rem; color: #f56565;">Any4D (Dense baseline)</h3>
+                    <div class="video-viewer-container" style="max-width: 600px; height: 350px; margin-left: auto; margin-right: auto;">
+                        <video id="comparison-video-baseline1" class="main-video" controls autoplay loop muted>
+                            <source src="assets/comparisons/baseline_a_clip_a.webm" type="video/webm">
+                        </video>
+                        <div class="loading-overlay" id="loading-overlay-comparison-baseline1">
+                            <div class="loading-spinner"></div><p>Loading video...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="text-align: center; margin-bottom: 1rem; color: #f56565;">SpatialTracker-v2 (Sparse baseline)</h3>
+                    <div class="video-viewer-container" style="max-width: 600px; height: 350px; margin-left: auto; margin-right: auto;">
+                        <video id="comparison-video-baseline2" class="main-video" controls autoplay loop muted>
+                            <source src="assets/comparisons/baseline_b_clip_a.webm" type="video/webm">
+                        </video>
+                        <div class="loading-overlay" id="loading-overlay-comparison-baseline2">
+                            <div class="loading-spinner"></div><p>Loading video...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sequence-thumbnails" style="margin: 2rem auto; justify-content: center; max-width: 800px; grid-template-columns: repeat(4, 1fr);">
+                <div class="thumbnail-item active comparison-thumbnail"
+                     data-ours="assets/comparisons/ours_clip_a.webm"
+                     data-baseline1="assets/comparisons/baseline_a_clip_a.webm"
+                     data-baseline2="assets/comparisons/baseline_b_clip_a.webm">
+                    <p class="thumbnail-label">ADT Clip A</p>
+                </div>
+                <div class="thumbnail-item comparison-thumbnail"
+                     data-ours="assets/comparisons/ours_clip_b.webm"
+                     data-baseline1="assets/comparisons/baseline_a_clip_b.webm"
+                     data-baseline2="assets/comparisons/baseline_b_clip_b.webm">
+                    <p class="thumbnail-label">DriveTrack B</p>
+                </div>
+                <div class="thumbnail-item comparison-thumbnail"
+                     data-ours="assets/comparisons/ours_clip_c.webm"
+                     data-baseline1="assets/comparisons/baseline_a_clip_c.webm"
+                     data-baseline2="assets/comparisons/baseline_b_clip_c.webm">
+                    <p class="thumbnail-label">PStudio C</p>
+                </div>
+                <div class="thumbnail-item comparison-thumbnail"
+                     data-ours="assets/comparisons/ours_clip_d.webm"
+                     data-baseline1="assets/comparisons/baseline_a_clip_d.webm"
+                     data-baseline2="assets/comparisons/baseline_b_clip_d.webm">
+                    <p class="thumbnail-label">Long Video D</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const comparisonThumbnails = document.querySelectorAll('.comparison-thumbnail');
+            const videoOurs = document.getElementById('comparison-video-ours');
+            const videoBaseline1 = document.getElementById('comparison-video-baseline1');
+            const videoBaseline2 = document.getElementById('comparison-video-baseline2');
+            const loadingOverlayOurs = document.getElementById('loading-overlay-comparison-ours');
+            const loadingOverlayBaseline1 = document.getElementById('loading-overlay-comparison-baseline1');
+            const loadingOverlayBaseline2 = document.getElementById('loading-overlay-comparison-baseline2');
+
+            function swapVideo(video, overlay, url) {
+                if (!url || !video) return;
+                if (overlay) overlay.style.display = 'flex';
+                video.src = url;
+                video.load();
+                video.onloadeddata = function() {
+                    if (overlay) overlay.style.display = 'none';
+                    video.play();
+                };
+                video.onerror = function() {
+                    if (overlay) overlay.style.display = 'none';
+                };
+            }
+
+            comparisonThumbnails.forEach(function(thumbnail) {
+                thumbnail.onclick = function() {
+                    comparisonThumbnails.forEach(function(t) { t.classList.remove('active'); });
+                    this.classList.add('active');
+                    swapVideo(videoOurs, loadingOverlayOurs, this.getAttribute('data-ours'));
+                    swapVideo(videoBaseline1, loadingOverlayBaseline1, this.getAttribute('data-baseline1'));
+                    swapVideo(videoBaseline2, loadingOverlayBaseline2, this.getAttribute('data-baseline2'));
+                };
+            });
+        })();
+    </script>
+
+    <!-- Scaling analysis -->
+    <div class="section">
+        <div class="container">
+            <h2>Scaling Analysis</h2>
+            <p class="section-intro">
+                Peak GPU memory and latency as a function of video length and number of query points on PointOdyssey (single L40S-46G GPU).
+                TrackEverything is the only method that tracks all points <em>densely</em> while staying under 30 GB at 900 frames.
+            </p>
+            <div class="image-showcase">
+                <img src="assets/images/supplementary.png" alt="TrackEverything scaling analysis" style="width: 100%; height: auto; display: block;">
+            </div>
+            <div style="max-width: 900px; margin: 1.5rem auto 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center;">
+                <div class="feature-card">
+                    <h3>Video Length Scaling</h3>
+                    <p>Any4D goes OOM at 96 frames. SpatialTracker-v2 at ~200 frames. CoTracker3 at ~600 frames. <strong>TrackEverything stays under 30 GB at 900+ frames.</strong></p>
+                </div>
+                <div class="feature-card">
+                    <h3>Query Point Scaling</h3>
+                    <p>CoTracker3 latency surpasses ours at ~2,000 query points. SpatialTracker-v2 exceeds memory at 1,000 points. <strong>TrackEverything maintains near-constant latency up to 10,000 query points.</strong></p>
+                </div>
+                <div class="feature-card">
+                    <h3>Why the Efficiency?</h3>
+                    <p>Three factors: (i) voxelized de-duplication of redundant 3D points, (ii) 3D WAFT in place of expensive 4D correlation volumes, (iii) sliding-window inference with O(scene content) complexity.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Limitations -->
+    <div class="section">
+        <div class="container">
+            <h2>Limitations</h2>
+            <p class="section-intro">
+                TrackEverything demonstrates strong performance, but several limitations remain open for future work.
+            </p>
+
+            <div class="feature-grid" style="margin-top: 2rem;">
+                <div class="feature-card">
+                    <h3>Model Scale & Data</h3>
+                    <p>Due to compute constraints, TrackEverything has not been scaled beyond 61M parameters nor trained on larger, more diverse datasets. Scaling both axes is likely to yield further gains, particularly on complex real-world scenes.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Unbounded Memory Growth</h3>
+                    <p>The current design retains all observed points indefinitely. Although voxelized de-duplication controls redundancy per window, memory will eventually become a bottleneck for very long videos (e.g., hours of footage). A dynamic eviction-and-retrieval strategy is needed for truly arbitrarily long sequences.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Reliance on External Geometry</h3>
+                    <p>TrackEverything relies on 3D pointmaps from an external estimator (e.g., Pi3) rather than predicting geometry end-to-end. While the architecture can in principle subsume geometry estimation, this direction requires substantially more training data and compute, which we leave to future work.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BibTeX -->
+    <div class="section">
+        <div class="container">
+            <h2>BibTeX</h2>
+            <p class="section-intro">
+                If you find this work useful, please cite our paper:
+            </p>
+            <div class="citation-box" style="margin-top: 1rem;">
+<pre><code>@inproceedings{trackeverything2026,
+  title     = {TrackEverything: Dense 3D Point Tracking in Long Videos via 3D Scene Representations},
+  author    = {Anonymous Author(s)},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2026},
+}</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acknowledgements -->
+    <div class="section">
+        <div class="container">
+            <h2>Acknowledgements</h2>
+            <p class="section-intro">
+                We thank the authors of Pi3, TAPIP-3D, SpatialTracker-v2, Any4D, CoTracker3, and WAFT for releasing code and models,
+                and the TAPVid-3D team for the benchmark. Interactive visualizations are powered by
+                <a href="https://rerun.io" class="author-link">Rerun</a>.
+            </p>
+        </div>
+    </div>
+
+</body>
+</html>
