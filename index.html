@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="TrackEverything — Dense 3D Point Tracking in Long Videos via 3D Scene Representations">
+    <meta name="description" content="TrackEverything: Dense 3D Point Tracking in Long Videos via 3D Scene Representations">
     <meta name="keywords" content="TrackEverything, dense tracking, 3D point tracking, long video, scene representation, voxelization, TAPVid-3D">
-    <title>TrackEverything — Dense 3D Point Tracking in Long Videos</title>
+    <title>TrackEverything: Dense 3D Point Tracking in Long Videos</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -24,11 +24,29 @@
         </div>
     </div>
 
+    <!-- Architecture figure -->
+    <div class="section">
+        <div class="container-wide">
+            <figure class="arch-figure">
+                <img src="assets/arch_v1.png" alt="TrackEverything architecture diagram">
+                <figcaption>
+                    <strong>TrackEverything architecture.</strong> Given a video as input, and associated depth and camera
+                    parameters, TrackEverything encodes each image with dino-v3 and lifts it to a 3D feature cloud.
+                    Next, we use an EndPoint Refiner transformer which attends in the 3D feature cloud and produces
+                    flow estimates for all points at the end of the window. It also decodes static/dynamic masks, and
+                    visibility. A trajectory refiner then takes the dynamic points and produces full dense tracks along the
+                    video. TrackEverything processes one window at a time, and also iteratively refines its estimates. For
+                    simplicity, we skip that from this figure.
+                </figcaption>
+            </figure>
+        </div>
+    </div>
+
     <!-- Teaser -->
     <div class="section">
         <div class="container">
             <p class="section-intro">
-                <strong>TL;DR:</strong> <span class="highlight-trackeverything">TrackEverything</span> is the first dense 3D point tracker that tracks <em>all</em> points across <em>all</em> frames in long videos (1000+ frames) — outperforming all open-source dense 3D trackers by <strong>over 20% APD</strong> while fitting within <strong>40 GB GPU memory</strong>.
+                <span class="highlight-trackeverything">TrackEverything</span> is a dense 3D point tracker that tracks all points across all frames in long videos of 1000+ frames. It outperforms open-source dense 3D trackers by over 20% APD on TAPVid-3D and runs in under 40 GB of GPU memory.
             </p>
         </div>
     </div>
@@ -39,11 +57,11 @@
             <div class="stats-bar">
                 <div class="stat-item">
                     <div class="stat-number">+20%</div>
-                    <div class="stat-label">APD over all open-source<br>dense 3D trackers</div>
+                    <div class="stat-label">APD over open-source<br>dense 3D trackers</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-number">1000+</div>
-                    <div class="stat-label">frames — dense tracking<br>on full-length sequences</div>
+                    <div class="stat-label">frames of dense tracking<br>on full-length sequences</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-number">&lt;40 GB</div>
@@ -51,7 +69,7 @@
                 </div>
                 <div class="stat-item">
                     <div class="stat-number">61M</div>
-                    <div class="stat-label">parameters — fraction of<br>prior SOTA model count</div>
+                    <div class="stat-label">parameters, a fraction of<br>prior SOTA model count</div>
                 </div>
             </div>
         </div>
@@ -85,7 +103,7 @@
 
     <!-- Visualizations -->
     <div class="section">
-        <div class="container">
+        <div class="container-wide">
             <h2>Visualizations</h2>
             <div class="viz-grid">
                 <div class="viz-item">
@@ -183,7 +201,7 @@
                         </tr>
                         <tr>
                             <td style="text-align:left; padding-left:1.5rem;">VDPM</td>
-                            <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
+                            <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
                             <td colspan="6" style="color:#aaa;">N/A</td>
                         </tr>
                         <tr class="ours">
