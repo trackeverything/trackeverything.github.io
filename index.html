@@ -5,241 +5,320 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="TrackEverything: Dense 3D Point Tracking in Long Videos via 3D Scene Representations">
     <meta name="keywords" content="TrackEverything, dense tracking, 3D point tracking, long video, scene representation, voxelization, TAPVid-3D">
-    <title>TrackEverything: Dense 3D Point Tracking in Long Videos</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>TrackEverything | Dense 3D Point Tracking in Long Videos</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="hero-section">
-        <div class="container">
-            <div class="hero-content">
-                <div class="hero-text">
-                    <h1><span class="highlight-trackeverything">TrackEverything</span>: Dense 3D Point Tracking in Long Videos via 3D Scene Representations</h1>
+    <div class="scroll-progress" aria-hidden="true"></div>
+
+    <main id="top">
+        <section class="hero-shell section-shell">
+            <div class="hero-panel">
+                <header class="site-header">
+                    <a class="brand" href="#top" aria-label="TrackEverything home">
+                        <span class="brand-mark" aria-hidden="true"></span>
+                        <span>TrackEverything</span>
+                    </a>
+                    <span class="header-rule" aria-hidden="true"></span>
+                    <nav class="site-nav" aria-label="Primary navigation">
+                        <a href="#results">Results</a>
+                        <a href="#method">Method</a>
+                        <a href="#visualizations">Visualizations</a>
+                        <a href="#benchmark">Benchmark</a>
+                        <a href="https://arxiv.org/" target="_blank" rel="noopener">Paper</a>
+                    </nav>
+                </header>
+
+                <aside class="hero-teaser" aria-label="TrackEverything tracking visualizations">
+                    <div id="heroShowcase" class="hero-showcase"></div>
+                    <p class="hero-teaser-hint">Click any clip to open an enlarged view.</p>
+                </aside>
+
+                <div class="hero-content paper-header">
+                    <div class="paper-title-row">
+                        <span class="paper-title-lead">
+                            <span class="paper-title-logo" aria-hidden="true"></span>
+                            <h1 class="paper-title">TrackEverything</h1>
+                        </span>
+                    </div>
+                    <p class="paper-subtitle">Dense 3D Point Tracking in Long Videos via 3D Scene Representations</p>
+                    <div class="author-block" aria-label="Paper authors and affiliations">
+                        <p class="author-list">
+                            <span><a href="">Ayush Jain</a></span>
+                            <span><a href="">Sreeharsha Paruchuri</a></span>
+                            <span><a href="">Ishita Gupta</a></span>
+                            <span><a href="">Fan Zhang</a></span>
+                            <span><a href="">Tanner Schmidt</a></span>
+                            <span><a href="">Jakob Engel</a></span>
+                            <span><a href="">Katerina Fragkiadaki</a></span>
+                            <span><a href="">Adam W Harley</a></span>
+                        </p>
+                        <p class="affiliation-list">
+                            <span>Carnegie Mellon University</span>
+                            <span>Meta</span>
+                        </p>
+                    </div>
+                    <div class="hero-actions" aria-label="Project links">
+                        <a href="assets/alltrack3r.pdf" class="button" target="_blank" rel="noopener">
+                            <i class="fas fa-file-pdf" aria-hidden="true"></i>
+                            <span>PDF</span>
+                        </a>
+                        <a href="https://github.com/" class="button" target="_blank" rel="noopener">
+                            <i class="fab fa-github" aria-hidden="true"></i>
+                            <span>Code</span>
+                        </a>
+                        <a href="https://arxiv.org/" class="button btn-arxiv" target="_blank" rel="noopener" aria-label="arXiv">
+                            <i class="ai ai-arxiv" aria-hidden="true"></i>
+                            <span>arXiv</span>
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <!-- Architecture figure -->
-    <div class="section">
-        <div class="container-wide">
-            <figure class="arch-figure">
-                <img src="assets/arch_v1.png" alt="TrackEverything architecture diagram">
-                <figcaption>
-                    <strong>TrackEverything architecture.</strong> Given a video as input, and associated depth and camera
-                    parameters, TrackEverything encodes each image with dino-v3 and lifts it to a 3D feature cloud.
-                    Next, we use an EndPoint Refiner transformer which attends in the 3D feature cloud and produces
-                    flow estimates for all points at the end of the window. It also decodes static/dynamic masks, and
-                    visibility. A trajectory refiner then takes the dynamic points and produces full dense tracks along the
-                    video. TrackEverything processes one window at a time, and also iteratively refines its estimates. For
-                    simplicity, we skip that from this figure.
-                </figcaption>
-            </figure>
-        </div>
-    </div>
-
-    <!-- Teaser -->
-    <div class="section">
-        <div class="container">
-            <p class="section-intro">
-                <span class="highlight-trackeverything">TrackEverything</span> is a dense 3D point tracker that tracks all points across all frames in long videos of 1000+ frames. It outperforms open-source dense 3D trackers by over 20% APD on TAPVid-3D and runs in under 40 GB of GPU memory.
-            </p>
-        </div>
-    </div>
-
-    <!-- Key stats -->
-    <div class="section">
-        <div class="container">
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <div class="stat-number">+20%</div>
-                    <div class="stat-label">APD over open-source<br>dense 3D trackers</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">1000+</div>
-                    <div class="stat-label">frames of dense tracking<br>on full-length sequences</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">&lt;40 GB</div>
-                    <div class="stat-label">peak GPU memory<br>at 1000+ frames</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">61M</div>
-                    <div class="stat-label">parameters, a fraction of<br>prior SOTA model count</div>
+        <section id="results" class="top-leaderboard section-shell" aria-label="Key results">
+            <div class="leaderboard-head">
+                <p class="kicker">Results</p>
+                <h2>Scaling dense 3D tracking to full-length video.</h2>
+                <p class="leaderboard-lede">
+                    TrackEverything is the first dense 3D point tracker that tracks
+                    <strong>all points across all frames</strong> in videos of 1000+ frames —
+                    outperforming open-source dense 3D trackers by over
+                    <strong>20% APD</strong> on TAPVid-3D while running in under
+                    <strong>40 GB</strong> of GPU memory.
+                </p>
+                <div class="leaderboard-side-stats" aria-label="Headline numbers">
+                    <article style="--score: 100;">
+                        <span>APD gain</span>
+                        <strong>+20%</strong>
+                        <small>over open dense 3D trackers</small>
+                        <i><b></b></i>
+                    </article>
+                    <article style="--score: 85;">
+                        <span>Video length</span>
+                        <strong>1000+</strong>
+                        <small>frames of dense tracking</small>
+                        <i><b></b></i>
+                    </article>
+                    <article style="--score: 65;">
+                        <span>GPU memory</span>
+                        <strong>&lt;40 GB</strong>
+                        <small>peak at 1000+ frames</small>
+                        <i><b></b></i>
+                    </article>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Abstract -->
-    <div class="section">
-        <div class="container">
-            <h2>Abstract</h2>
-            <div class="section-intro text-justified">
-                <p style="margin-bottom: 1.5rem;">
-                    Videos are 2D projections of a persistent 3D world, yet most tracking methods operate in pixel space, redundantly
-                    re-representing the same surfaces across frames. This limits them to either tracking a sparse set of query points or
-                    tracking densely but only over short clips. We introduce <strong>TrackEverything</strong>, a dense 3D point tracker that represents
-                    videos as persistent 3D scene tracks in world coordinates. Our approach combines three ideas:
-                    (1) tracking in 3D scene-content space, where repeated observations of the same surface are fused and occluded points
-                    persist without redundant representation;
-                    (2) a recurrent architecture that iteratively refines motion estimates and chains predictions across sliding windows
-                    for long-video inference; and
-                    (3) per-window static/dynamic classification that allocates trajectory decoding only to points in motion, saving
-                    computation on the majority of static scene content. At each window boundary, the 3D representation is voxelized
-                    to remove redundant points, ensuring that model complexity scales with the amount of distinct scene content rather
-                    than video length. To the best of our knowledge, TrackEverything is the first dense 3D point tracker that can track
-                    all points across all frames in long videos (1000+ frames). On TAPVid-3D, TrackEverything outperforms all open-source
-                    dense 3D trackers by over 20% APD on short clips and is the only dense method that scales to full-length sequences,
-                    where it remains competitive with state-of-the-art sparse 3D trackers despite tracking orders of magnitude more points.
+            <div class="leaderboard-board">
+                <figure class="arch-card">
+                    <img src="assets/arch_v1.png" alt="TrackEverything architecture diagram">
+                    <figcaption>
+                        <strong>TrackEverything architecture.</strong> Given a video and associated depth and camera
+                        parameters, TrackEverything encodes each image with DINOv3 and lifts it to a 3D feature cloud.
+                        An EndPoint Refiner transformer attends in the 3D feature cloud and produces flow estimates,
+                        static/dynamic masks, and visibility. A trajectory refiner then decodes full dense tracks for
+                        dynamic points across the video.
+                    </figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <section id="method" class="content-section">
+            <div class="section-shell">
+                <div class="section-heading compact">
+                    <p class="kicker">Method</p>
+                    <h2>What is TrackEverything?</h2>
+                    <div class="body-copy">
+                        <p>
+                            Videos are 2D projections of a persistent 3D world, yet most tracking methods operate in pixel
+                            space, redundantly re-representing the same surfaces across frames. We introduce
+                            <strong>TrackEverything</strong>, a dense 3D point tracker that represents videos as persistent
+                            3D scene tracks in world coordinates.
+                        </p>
+                        <p>
+                            Our approach combines three ideas: (1) tracking in 3D scene-content space, where repeated
+                            observations of the same surface are fused and occluded points persist without redundant
+                            representation; (2) a recurrent architecture that iteratively refines motion estimates and
+                            chains predictions across sliding windows for long-video inference; and (3) per-window
+                            static/dynamic classification that allocates trajectory decoding only to points in motion.
+                            At each window boundary, the 3D representation is voxelized to remove redundant points,
+                            ensuring model complexity scales with distinct scene content rather than video length.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="vstat-stats">
+                    <article class="stat-pill">
+                        <strong>+20%</strong>
+                        <span>APD over open dense 3D</span>
+                    </article>
+                    <article class="stat-pill">
+                        <strong>1000+</strong>
+                        <span>frames tracked densely</span>
+                    </article>
+                    <article class="stat-pill">
+                        <strong>&lt;40 GB</strong>
+                        <span>peak GPU memory</span>
+                    </article>
+                    <article class="stat-pill">
+                        <strong>61M</strong>
+                        <span>parameters</span>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="visualizations" class="content-section examples-section">
+            <div class="section-shell">
+                <div class="vstat-examples">
+                    <div class="vstat-examples-head">
+                        <p class="kicker">Visualizations</p>
+                        <h3>A glimpse across <span class="task-count">7</span> sequences.</h3>
+                        <p class="vstat-examples-subcopy">
+                            Representative dense 3D tracking results on DAVIS and in-the-wild footage.
+                            <strong>Click any clip</strong> to open an enlarged view with details.
+                        </p>
+                    </div>
+                    <div id="exampleGallery" class="example-gallery is-collapsed" aria-label="Tracking visualization gallery"></div>
+                    <div class="vstat-examples-actions">
+                        <button
+                            id="exampleToggle"
+                            type="button"
+                            class="example-toggle"
+                            aria-controls="exampleGallery"
+                            aria-expanded="false"
+                        >Show all 7 clips</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="benchmark" class="content-section">
+            <div class="section-shell">
+                <div class="section-heading compact">
+                    <p class="kicker">Benchmark</p>
+                    <h2>Quantitative results on TAPVid-3D.</h2>
+                    <p>
+                        Evaluation across three datasets in the <em>first 48 frames</em> (short clips) and
+                        <em>full-length video</em> regimes. TrackEverything is the only dense method that runs on
+                        full-length sequences. Bold = best open dense method per column.
+                    </p>
+                </div>
+                <div class="results-table-wrapper">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" class="method-col">Method</th>
+                                <th colspan="6" class="group-header">First 48 Frames</th>
+                                <th colspan="6" class="group-header">Full-Length Video</th>
+                            </tr>
+                            <tr>
+                                <th>ADT<br><small>APD-P</small></th>
+                                <th>ADT<br><small>APD-M</small></th>
+                                <th>DriveTrk<br><small>APD-P</small></th>
+                                <th>DriveTrk<br><small>APD-M</small></th>
+                                <th>PStudio<br><small>APD-P</small></th>
+                                <th>PStudio<br><small>APD-M</small></th>
+                                <th>ADT<br><small>APD-P</small></th>
+                                <th>ADT<br><small>APD-M</small></th>
+                                <th>DriveTrk<br><small>APD-P</small></th>
+                                <th>DriveTrk<br><small>APD-M</small></th>
+                                <th>PStudio<br><small>APD-P</small></th>
+                                <th>PStudio<br><small>APD-M</small></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="section-header">
+                                <td colspan="13">Sparse Tracking Baselines</td>
+                            </tr>
+                            <tr>
+                                <td class="method-col">CoTracker3 + Pi3</td>
+                                <td>38.7</td><td>88.0</td><td>29.2</td><td>41.9</td><td>23.7</td><td>83.1</td>
+                                <td>31.4</td><td>82.3</td><td>24.3</td><td>40.5</td><td>18.7</td><td>80.2</td>
+                            </tr>
+                            <tr>
+                                <td class="method-col">SpatialTracker-v2 + Pi3</td>
+                                <td>39.9</td><td>88.1</td><td>29.8</td><td>42.5</td><td>20.6</td><td>80.7</td>
+                                <td>32.1</td><td>82.4</td><td>26.2</td><td>43.5</td><td>17.2</td><td>78.5</td>
+                            </tr>
+                            <tr>
+                                <td class="method-col">TAPIP-3D + Pi3</td>
+                                <td>39.6</td><td>88.5</td><td>28.5</td><td>41.0</td><td>23.9</td><td>83.4</td>
+                                <td>32.7</td><td>82.0</td><td>25.0</td><td>40.9</td><td>19.1</td><td>80.7</td>
+                            </tr>
+                            <tr class="section-header">
+                                <td colspan="13">Dense Tracking Baselines</td>
+                            </tr>
+                            <tr>
+                                <td class="method-col">Any4D + Pi3</td>
+                                <td>5.1</td><td>61.5</td><td>2.6</td><td>5.4</td><td>4.2</td><td>66.0</td>
+                                <td colspan="6" class="na-cell">N/A (OOM)</td>
+                            </tr>
+                            <tr>
+                                <td class="method-col">VDPM</td>
+                                <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
+                                <td colspan="6" class="na-cell">N/A</td>
+                            </tr>
+                            <tr class="ours">
+                                <td class="method-col">TrackEverything (Ours)</td>
+                                <td class="bold">40.0</td><td class="bold">89.1</td><td class="bold">26.7</td><td class="bold">38.8</td><td class="bold">22.7</td><td class="bold">83.4</td>
+                                <td class="bold">30.5</td><td class="bold">81.6</td><td class="bold">23.7</td><td class="bold">39.6</td><td class="bold">17.8</td><td class="bold">80.4</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="section-footnote">
+                    D4RT (closed-source, 1B parameters) achieves higher APD-P on 48-frame clips but has not been
+                    evaluated beyond 48 frames. TrackEverything uses 61M parameters trained on publicly available
+                    datasets only.
                 </p>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <!-- Visualizations -->
-    <div class="section">
-        <div class="container-wide">
-            <h2>Visualizations</h2>
-            <div class="viz-grid">
-                <div class="viz-item">
-                    <video controls autoplay loop muted playsinline>
-                        <source src="assets/davis_libby_mask.mp4" type="video/mp4">
-                    </video>
+        <section id="citation" class="content-section citation-section">
+            <div class="section-shell">
+                <div class="section-heading compact">
+                    <p class="kicker">Citation</p>
+                    <h2>Reference the paper.</h2>
                 </div>
-                <div class="viz-item">
-                    <video controls autoplay loop muted playsinline>
-                        <source src="assets/davis_dance-twirl.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <div class="viz-item">
-                    <video controls autoplay loop muted playsinline>
-                        <source src="assets/davis-drive-chicane.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <div class="viz-item">
-                    <video controls autoplay loop muted playsinline>
-                        <source src="assets/soap-box.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <div class="viz-item">
-                    <video controls autoplay loop muted playsinline>
-                        <source src="assets/davis_cow.mp4" type="video/mp4">
-                    </video>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quantitative results -->
-    <div class="section">
-        <div class="container">
-            <h2>Quantitative Results</h2>
-            <p class="section-intro">
-                TAPVid-3D evaluation across three datasets in the <em>first 48 frames</em> (short clips, aligned with prior dense methods)
-                and <em>full-length video</em> regimes. TrackEverything is the only dense method that runs on full-length sequences.
-                All methods use Pi3 geometry where supported. Bold = best open dense method per column.
-            </p>
-            <div class="results-table-wrapper">
-                <table class="results-table">
-                    <thead>
-                        <tr>
-                            <th rowspan="2" style="text-align:left; padding-left:1rem;">Method</th>
-                            <th colspan="6" class="group-header">First 48 Frames</th>
-                            <th colspan="6" class="group-header">Full-Length Video</th>
-                        </tr>
-                        <tr>
-                            <th>ADT<br><small>APD-P</small></th>
-                            <th>ADT<br><small>APD-M</small></th>
-                            <th>DriveTrk<br><small>APD-P</small></th>
-                            <th>DriveTrk<br><small>APD-M</small></th>
-                            <th>PStudio<br><small>APD-P</small></th>
-                            <th>PStudio<br><small>APD-M</small></th>
-                            <th>ADT<br><small>APD-P</small></th>
-                            <th>ADT<br><small>APD-M</small></th>
-                            <th>DriveTrk<br><small>APD-P</small></th>
-                            <th>DriveTrk<br><small>APD-M</small></th>
-                            <th>PStudio<br><small>APD-P</small></th>
-                            <th>PStudio<br><small>APD-M</small></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="section-header">
-                            <td colspan="13">Sparse Tracking Baselines</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:left; padding-left:1.5rem;">CoTracker3 + Pi3</td>
-                            <td>38.7</td><td>88.0</td><td>29.2</td><td>41.9</td><td>23.7</td><td>83.1</td>
-                            <td>31.4</td><td>82.3</td><td>24.3</td><td>40.5</td><td>18.7</td><td>80.2</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:left; padding-left:1.5rem;">SpatialTracker-v2 + Pi3</td>
-                            <td>39.9</td><td>88.1</td><td>29.8</td><td>42.5</td><td>20.6</td><td>80.7</td>
-                            <td>32.1</td><td>82.4</td><td>26.2</td><td>43.5</td><td>17.2</td><td>78.5</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:left; padding-left:1.5rem;">TAPIP-3D + Pi3</td>
-                            <td>39.6</td><td>88.5</td><td>28.5</td><td>41.0</td><td>23.9</td><td>83.4</td>
-                            <td>32.7</td><td>82.0</td><td>25.0</td><td>40.9</td><td>19.1</td><td>80.7</td>
-                        </tr>
-                        <tr class="section-header">
-                            <td colspan="13">Dense Tracking Baselines</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:left; padding-left:1.5rem;">Any4D + Pi3</td>
-                            <td>5.1</td><td>61.5</td><td>2.6</td><td>5.4</td><td>4.2</td><td>66.0</td>
-                            <td colspan="6" style="color:#aaa;">N/A (OOM)</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:left; padding-left:1.5rem;">VDPM</td>
-                            <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
-                            <td colspan="6" style="color:#aaa;">N/A</td>
-                        </tr>
-                        <tr class="ours">
-                            <td style="text-align:left; padding-left:1.5rem;">TrackEverything (Ours)</td>
-                            <td class="bold">40.0</td><td class="bold">89.1</td><td class="bold">26.7</td><td class="bold">38.8</td><td class="bold">22.7</td><td class="bold">83.4</td>
-                            <td class="bold">30.5</td><td class="bold">81.6</td><td class="bold">23.7</td><td class="bold">39.6</td><td class="bold">17.8</td><td class="bold">80.4</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <p class="section-intro" style="font-size:0.88rem; color:#777; margin-top:0.75rem;">
-                D4RT (closed-source, 1B parameters, undisclosed data) achieves higher APD-P on 48-frame clips but has not been evaluated beyond 48 frames. TrackEverything uses 61M parameters trained on publicly available datasets only.
-            </p>
-        </div>
-    </div>
-
-    <!-- BibTeX -->
-    <div class="section">
-        <div class="container">
-            <h2>BibTeX</h2>
-            <p class="section-intro">
-                If you find this work useful, please cite our paper:
-            </p>
-            <div class="citation-box" style="margin-top: 1rem;">
-<pre><code>@inproceedings{trackeverything2026,
+                <pre><code>@inproceedings{trackeverything2026,
   title     = {TrackEverything: Dense 3D Point Tracking in Long Videos via 3D Scene Representations},
   booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
   year      = {2026},
 }</code></pre>
             </div>
+        </section>
+
+        <footer class="site-footer section-shell">
+            <a class="brand" href="#top">
+                <span class="brand-mark" aria-hidden="true"></span>
+                <span>TrackEverything</span>
+            </a>
+            <div class="footer-links">
+                <a href="assets/alltrack3r.pdf" target="_blank" rel="noopener">Paper</a>
+                <a href="#benchmark">Benchmark</a>
+                <a href="https://github.com/" target="_blank" rel="noopener">Code</a>
+            </div>
+        </footer>
+    </main>
+
+    <div class="example-lightbox" id="exampleLightbox" role="dialog" aria-modal="true" aria-hidden="true">
+        <button type="button" class="example-lightbox-close" aria-label="Close detail view">&times;</button>
+        <div class="example-lightbox-card" role="document">
+            <div class="example-lightbox-media">
+                <video
+                    class="example-lightbox-video"
+                    controls
+                    playsinline
+                    preload="metadata"
+                ></video>
+            </div>
+            <div class="example-lightbox-body" id="exampleLightboxBody"></div>
         </div>
     </div>
 
-    <!-- Acknowledgements -->
-    <div class="section">
-        <div class="container">
-            <h2>Acknowledgements</h2>
-            <p class="section-intro">
-                We thank the authors of Pi3, TAPIP-3D, SpatialTracker-v2, Any4D, CoTracker3, and WAFT for releasing code and models,
-                and the TAPVid-3D team for the benchmark.
-            </p>
-        </div>
-    </div>
-
+    <script src="site.js"></script>
 </body>
 </html>
