@@ -1,363 +1,64 @@
-const VIDEO_CATALOG = [
-  {
-    id: "pstudio",
-    title: "Portrait Studio",
-    source: "PStudio",
-    video: "assets/pstudio_1.mp4",
-    type: "video/mp4",
-    tags: ["Indoor scene", "Dense tracks"],
-    description:
-      "Indoor portrait-studio sequence with dense 3D point tracks across static and dynamic scene content.",
-  },
-  {
-    id: "twirl",
-    title: "Twirl",
-    source: "DAVIS",
-    video: "assets/twirl_1.mp4",
-    type: "video/mp4",
-    tags: ["Rotation", "Persistent tracks"],
-    description:
-      "Rotational motion stress test: TrackEverything maintains persistent 3D scene tracks through fast twirling.",
-  },
-  {
-    id: "libby",
-    title: "Libby",
-    source: "DAVIS",
-    video: "assets/davis_libby_mask.mp4",
-    type: "video/mp4",
-    tags: ["Dense 3D tracking", "Occlusion"],
-    description:
-      "Dense 3D point tracks on a masked foreground subject, with persistent world-coordinate trajectories through partial occlusion.",
-  },
-  {
-    id: "dance-twirl",
-    title: "Dance Twirl",
-    source: "DAVIS",
-    video: "assets/davis_dance-twirl.mp4",
-    type: "video/mp4",
-    tags: ["Fast motion", "Articulated object"],
-    description:
-      "Tracking through rapid rotational motion: dense 3D scene tracks remain stable as the dancer twirls.",
-  },
-  {
-    id: "drive-chicane",
-    title: "Drive Chicane",
-    source: "DAVIS",
-    video: "assets/davis-drive-chicane.mp4",
-    type: "video/mp4",
-    tags: ["Dynamic scene", "Camera motion"],
-    description:
-      "Outdoor driving sequence with moving camera and multiple dynamic objects tracked densely in 3D.",
-  },
-  {
-    id: "soap-box",
-    title: "Soap Box",
-    source: "In the wild",
-    video: "assets/soap-box.mp4",
-    type: "video/mp4",
-    tags: ["Long video", "Multi-object"],
-    description:
-      "In-the-wild sequence demonstrating dense 3D tracking across a complex dynamic scene.",
-  },
-  {
-    id: "cow",
-    title: "Cow",
-    source: "DAVIS",
-    video: "assets/davis_cow.mp4",
-    type: "video/mp4",
-    tags: ["Animal motion", "Deformable object"],
-    description:
-      "Dense tracks on a deformable animal subject, fusing repeated surface observations across frames.",
-  },
-];
+/* TrackEverything project page: sequence selector, lazy video playback,
+   sliding clip carousel, lightbox. */
 
-const videoById = new Map(VIDEO_CATALOG.map((item) => [item.id, item]));
+const prefersReducedMotion = () =>
+  window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
 
-const ZOOM_ICON = `
-  <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-    <path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
-      d="M3 3h4M3 3v4M13 13H9M13 13V9M3 13h4M3 13v-4M13 3H9M13 3v4"/>
-  </svg>
-`;
+const scrollMode = () => (prefersReducedMotion() ? "auto" : "smooth");
 
-const escapeHtml = (value) =>
-  String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+/* ---------------------------------------------------------------- viewer --- */
 
-const renderHeroShowcase = () => {
-  const stage = document.getElementById("heroShowcase");
-  if (!stage) return;
+const setupSequenceViewer = () => {
+  const list = document.getElementById("sequenceList");
+  const video = document.getElementById("viewerVideo");
+  if (!list || !video) return;
 
-  stage.innerHTML = `
-    <div class="hero-video-strip" aria-label="TrackEverything tracking visualizations">
-      ${VIDEO_CATALOG.map(
-        (item) => `
-          <button
-            type="button"
-            class="hero-video-card"
-            data-video-id="${escapeHtml(item.id)}"
-            aria-label="Open ${escapeHtml(item.title)} in detail"
-          >
-            <video muted loop playsinline preload="metadata" data-autoplay>
-              <source src="${escapeHtml(item.video)}" type="${escapeHtml(item.type)}">
-            </video>
-          </button>
-        `,
-      ).join("")}
-    </div>
-  `;
+  list.addEventListener("click", (event) => {
+    const button = event.target.closest(".sequence-item");
+    if (!button) return;
 
-  const strip = stage.querySelector(".hero-video-strip");
-  const cards = [...strip.querySelectorAll(".hero-video-card")];
-  const gap = 6;
-  const ratios = new Map();
-  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const src = button.dataset.video;
+    if (!src || video.getAttribute("src") === src) return;
 
-  cards.forEach((card, index) => {
-    if (prefersReducedMotion) {
-      card.classList.add("is-in");
-      return;
-    }
-    setTimeout(() => card.classList.add("is-in"), 140 + index * 45);
-  });
+    list.querySelectorAll(".sequence-item").forEach((item) => item.classList.remove("is-active"));
+    button.classList.add("is-active");
 
-  const targetRowHeight = () => {
-    const w = window.innerWidth;
-    if (w <= 600) return 96;
-    if (w <= 880) return 128;
-    return 168;
-  };
-
-  const visibleCount = () => {
-    const w = window.innerWidth;
-    if (w <= 600) return 6;
-    if (w <= 880) return Math.min(9, cards.length);
-    return cards.length;
-  };
-
-  const layout = () => {
-    const containerWidth = strip.clientWidth;
-    if (!containerWidth) return;
-    const target = targetRowHeight();
-    const count = visibleCount();
-
-    cards.forEach((card, index) => {
-      card.style.display = index < count ? "block" : "none";
-    });
-
-    const activeCards = cards.slice(0, count);
-
-    const flushRow = (rowCards) => {
-      if (!rowCards.length) return;
-      const ratioSum = rowCards.reduce((sum, card) => sum + (ratios.get(card) || 1.6), 0);
-      const gaps = gap * (rowCards.length - 1);
-      const rowHeight = (containerWidth - gaps) / ratioSum;
-      rowCards.forEach((card) => {
-        const ratio = ratios.get(card) || 1.6;
-        card.style.flex = "0 0 auto";
-        card.style.height = `${rowHeight}px`;
-        card.style.width = `${rowHeight * ratio}px`;
-      });
-    };
-
-    let row = [];
-    let rowRatio = 0;
-    const maxRowHeight = target * 1.5;
-
-    activeCards.forEach((card) => {
-      const ratio = ratios.get(card) || 1.6;
-      row.push(card);
-      rowRatio += ratio;
-      const projectedWidth = rowRatio * target + gap * (row.length - 1);
-      if (projectedWidth >= containerWidth) {
-        flushRow(row);
-        row = [];
-        rowRatio = 0;
-      }
-    });
-
-    if (row.length) {
-      const ratioSum = row.reduce((sum, card) => sum + (ratios.get(card) || 1.6), 0);
-      const gaps = gap * (row.length - 1);
-      const fullWidthHeight = (containerWidth - gaps) / ratioSum;
-      if (fullWidthHeight <= maxRowHeight) {
-        flushRow(row);
-      } else {
-        row.forEach((card) => {
-          card.style.display = "none";
-        });
-      }
-    }
-  };
-
-  cards.forEach((card) => {
-    const video = card.querySelector("video");
-    if (!video) return;
-    const onMeta = () => {
-      const ratio = video.videoWidth / video.videoHeight;
-      if (Number.isFinite(ratio) && ratio > 0) ratios.set(card, ratio);
-      layout();
-    };
-    if (video.readyState >= 1) onMeta();
-    else video.addEventListener("loadedmetadata", onMeta, { once: true });
-  });
-
-  let resizeTimer = null;
-  window.addEventListener("resize", () => {
-    if (resizeTimer) clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(layout, 120);
-  });
-
-  layout();
-};
-
-const renderExampleGallery = () => {
-  const target = document.getElementById("exampleGallery");
-  if (!target) return;
-
-  target.innerHTML = VIDEO_CATALOG.map(
-    (item) => `
-      <article class="example-card" data-video-id="${escapeHtml(item.id)}" data-source="${escapeHtml(item.source)}">
-        <div class="example-media">
-          <video
-            muted
-            loop
-            playsinline
-            preload="none"
-            data-autoplay
-            data-unload="true"
-            data-src="${escapeHtml(item.video)}"
-          ></video>
-          <button type="button" class="example-zoom" aria-label="Open ${escapeHtml(item.title)} in detail">
-            ${ZOOM_ICON}
-          </button>
-        </div>
-        <div class="example-body">
-          <div class="example-topline">
-            <span>${escapeHtml(item.source)}</span>
-          </div>
-          <h3>${escapeHtml(item.title)}</h3>
-          <div class="example-taxonomy">
-            ${item.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}
-          </div>
-          <div class="mini-qa">
-            <p>${escapeHtml(item.description)}</p>
-          </div>
-        </div>
-      </article>
-    `,
-  ).join("");
-};
-
-const setupVideoLightbox = () => {
-  const lightbox = document.getElementById("exampleLightbox");
-  if (!lightbox) return;
-
-  const video = lightbox.querySelector(".example-lightbox-video");
-  const body = lightbox.querySelector("#exampleLightboxBody");
-  const closeBtn = lightbox.querySelector(".example-lightbox-close");
-
-  const close = () => {
-    if (!lightbox.classList.contains("is-open")) return;
-    lightbox.classList.remove("is-open");
-    lightbox.setAttribute("aria-hidden", "true");
-    video.pause();
-    video.removeAttribute("src");
-    body.innerHTML = "";
-    document.documentElement.style.overflow = "";
-  };
-
-  const open = (item) => {
-    video.src = item.video;
-    body.innerHTML = `
-      <div class="lightbox-meta">
-        <span class="lightbox-source">${escapeHtml(item.source)}</span>
-        <h3>${escapeHtml(item.title)}</h3>
-        <div class="lightbox-tax">
-          ${item.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}
-        </div>
-      </div>
-      <div class="lightbox-description">
-        <span class="lightbox-q-label">Tracking visualization</span>
-        <p class="lightbox-q">${escapeHtml(item.description)}</p>
-      </div>
-    `;
-
-    lightbox.classList.add("is-open");
-    lightbox.setAttribute("aria-hidden", "false");
-    document.documentElement.style.overflow = "hidden";
+    video.src = src;
+    video.load();
     video.play().catch(() => {});
-  };
-
-  document.addEventListener("click", (event) => {
-    const card = event.target.closest(".example-card, .hero-video-card");
-    if (!card || lightbox.contains(event.target)) return;
-    const videoId = card.dataset.videoId;
-    if (!videoId) return;
-    const item = videoById.get(videoId);
-    if (!item) return;
-    event.preventDefault();
-    open(item);
-  });
-
-  closeBtn.addEventListener("click", close);
-  lightbox.addEventListener("click", (event) => {
-    if (event.target === lightbox) close();
-  });
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") close();
   });
 };
 
-const setupGalleryCollapse = () => {
-  const gallery = document.getElementById("exampleGallery");
-  const toggle = document.getElementById("exampleToggle");
-  if (!gallery || !toggle) return;
+/* ------------------------------------------------------- lazy playback ----- */
 
-  const cards = gallery.querySelectorAll(".example-card");
-  if (cards.length <= 4) {
-    toggle.style.display = "none";
-    return;
+const ensureSource = (video) => {
+  if (video && !video.getAttribute("src") && video.dataset.src) {
+    video.setAttribute("src", video.dataset.src);
   }
-
-  gallery.classList.add("is-collapsed");
-
-  const setLabel = () => {
-    const expanded = !gallery.classList.contains("is-collapsed");
-    toggle.textContent = expanded ? "Show fewer" : `Show all ${cards.length} clips`;
-    toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
-  };
-
-  setLabel();
-  toggle.addEventListener("click", () => {
-    gallery.classList.toggle("is-collapsed");
-    setLabel();
-    if (gallery.classList.contains("is-collapsed")) {
-      gallery.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  });
 };
 
+const releaseSource = (video) => {
+  if (!video || video.dataset.unload !== "true" || !video.getAttribute("src")) return;
+  video.pause();
+  video.removeAttribute("src");
+  video.load();
+};
+
+/* Grid clips load and play on viewport intersection. Carousel clips are
+   excluded; the rail manages its own loading window. */
 const setupVideoPlayback = () => {
-  const videos = [...document.querySelectorAll("video[data-autoplay]")];
+  const videos = [...document.querySelectorAll("video[data-autoplay]")].filter(
+    (video) => !video.closest("[data-rail]"),
+  );
   if (!videos.length) return;
 
-  const ensureSource = (video) => {
-    if (!video.getAttribute("src") && video.dataset.src) {
-      video.setAttribute("src", video.dataset.src);
-    }
-  };
-
-  const releaseSource = (video) => {
-    if (video.dataset.unload !== "true" || !video.getAttribute("src")) return;
-    video.pause();
-    video.removeAttribute("src");
-    video.load();
-  };
+  if (!("IntersectionObserver" in window)) {
+    videos.forEach((video) => {
+      ensureSource(video);
+      video.play().catch(() => {});
+    });
+    return;
+  }
 
   const loadObserver = new IntersectionObserver(
     (entries) => {
@@ -365,130 +66,359 @@ const setupVideoPlayback = () => {
         entry.isIntersecting ? ensureSource(entry.target) : releaseSource(entry.target),
       );
     },
-    { rootMargin: "500px 0px" },
+    { rootMargin: "400px 0px" },
   );
 
   const playObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        const videoEl = entry.target;
         if (entry.isIntersecting) {
-          ensureSource(videoEl);
-          videoEl.play().catch(() => {});
+          ensureSource(entry.target);
+          entry.target.play().catch(() => {});
         } else {
-          videoEl.pause();
+          entry.target.pause();
         }
       });
     },
     { threshold: 0.15 },
   );
 
-  videos.forEach((videoEl) => {
-    loadObserver.observe(videoEl);
-    playObserver.observe(videoEl);
+  videos.forEach((video) => {
+    loadObserver.observe(video);
+    playObserver.observe(video);
   });
 };
 
-const setupHeroSpotlight = () => {
-  const hero = document.querySelector(".hero-panel");
-  if (!hero) return;
+/* ------------------------------------------------------- clip carousel ----- */
 
-  hero.addEventListener("pointermove", (event) => {
-    const rect = hero.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width) * 100;
-    const y = ((event.clientY - rect.top) / rect.height) * 100;
-    hero.style.setProperty("--hero-x", `${x.toFixed(1)}%`);
-    hero.style.setProperty("--hero-y", `${y.toFixed(1)}%`);
-  });
-};
+/* Horizontal snap-scrolled strip. Only clips near the rail viewport hold a
+   source. rootMargin cannot expand past the rail's own clipping box, so the
+   window is measured from client rects instead of an observer. */
+const setupClipRails = () => {
+  document.querySelectorAll("[data-carousel]").forEach((carousel) => {
+    const shell = carousel.querySelector(".rail-shell");
+    const rail = carousel.querySelector("[data-rail]");
+    const prev = carousel.querySelector("[data-rail-prev]");
+    const next = carousel.querySelector("[data-rail-next]");
+    const dotsHost = carousel.querySelector("[data-rail-dots]");
+    const countHost = carousel.querySelector("[data-rail-count]");
+    if (!rail) return;
 
-const setupReveal = () => {
-  const items = document.querySelectorAll(
-    [
-      ".hero-panel",
-      ".leaderboard-head",
-      ".leaderboard-board",
-      ".section-heading",
-      ".vstat-stats",
-      ".example-card",
-      ".results-table-wrapper",
-      ".citation-section pre",
-    ].join(", "),
-  );
+    const clips = [...rail.querySelectorAll(".clip")];
+    if (!clips.length) return;
 
-  items.forEach((item, index) => {
-    item.classList.add("reveal-item");
-    item.style.setProperty("--reveal-delay", `${Math.min(index % 8, 6) * 45}ms`);
-  });
+    let dots = [];
+    let pages = 1;
+    let onScreen = true;
 
-  document.body.classList.add("reveal-ready");
+    const page = () => {
+      const view = rail.clientWidth;
+      return view ? Math.min(pages - 1, Math.round(rail.scrollLeft / view)) : 0;
+    };
 
-  if (!("IntersectionObserver" in window)) {
-    items.forEach((item) => item.classList.add("is-visible"));
-    return;
-  }
+    const update = () => {
+      const view = rail.clientWidth;
+      if (!view) return;
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
+      const railLeft = rail.getBoundingClientRect().left;
+      let first = -1;
+      let last = -1;
+
+      clips.forEach((clip, i) => {
+        const video = clip.querySelector("video");
+        if (!video) return;
+
+        const rect = clip.getBoundingClientRect();
+        const start = rect.left - railLeft;
+        const end = rect.right - railLeft;
+        const visible = end > 4 && start < view - 4;
+
+        if (visible) {
+          if (first < 0) first = i;
+          last = i;
         }
-      });
-    },
-    { rootMargin: "0px 0px -8% 0px", threshold: 0.12 },
-  );
 
-  items.forEach((item) => observer.observe(item));
+        /* Load one page either side, drop past two: the gap between the two
+           thresholds keeps a slow scroll from thrashing load/unload. */
+        if (end > -view && start < 2 * view) ensureSource(video);
+        else if (end < -2 * view || start > 3 * view) releaseSource(video);
+
+        if (visible && onScreen) video.play().catch(() => {});
+        else video.pause();
+      });
+
+      const atStart = rail.scrollLeft <= 2;
+      const atEnd = rail.scrollLeft >= rail.scrollWidth - view - 2;
+      if (prev) prev.disabled = atStart;
+      if (next) next.disabled = atEnd;
+      shell?.classList.toggle("is-start", atStart);
+      shell?.classList.toggle("is-end", atEnd);
+
+      const active = page();
+      dots.forEach((dot, i) => {
+        dot.classList.toggle("is-active", i === active);
+        dot.setAttribute("aria-selected", i === active ? "true" : "false");
+      });
+
+      if (countHost && first >= 0) {
+        countHost.textContent =
+          first === last
+            ? `Clip ${first + 1} of ${clips.length}`
+            : `Clips ${first + 1}-${last + 1} of ${clips.length}`;
+      }
+    };
+
+    const goToPage = (index) => {
+      const view = rail.clientWidth;
+      rail.scrollTo({ left: index * view, behavior: scrollMode() });
+    };
+
+    const measure = () => {
+      const view = rail.clientWidth;
+      const count = view ? Math.max(1, Math.ceil((rail.scrollWidth - 2) / view)) : 1;
+
+      if (dotsHost && count !== pages) {
+        dotsHost.textContent = "";
+        dots = Array.from({ length: count }, (_, i) => {
+          const dot = document.createElement("button");
+          dot.type = "button";
+          dot.className = "rail-dot";
+          dot.setAttribute("role", "tab");
+          dot.setAttribute("aria-label", `Go to page ${i + 1} of ${count}`);
+          dot.addEventListener("click", () => goToPage(i));
+          dotsHost.append(dot);
+          return dot;
+        });
+      }
+
+      pages = count;
+      update();
+    };
+
+    /* -------------------------------------------------------- controls --- */
+
+    const nudge = (direction) =>
+      rail.scrollBy({ left: direction * rail.clientWidth, behavior: scrollMode() });
+
+    prev?.addEventListener("click", () => nudge(-1));
+    next?.addEventListener("click", () => nudge(1));
+
+    rail.addEventListener("keydown", (event) => {
+      const step = { ArrowLeft: -1, ArrowRight: 1 }[event.key];
+      if (step) {
+        event.preventDefault();
+        nudge(step);
+        return;
+      }
+      if (event.key === "Home" || event.key === "End") {
+        event.preventDefault();
+        goToPage(event.key === "Home" ? 0 : pages - 1);
+      }
+    });
+
+    /* Mouse drag to slide. Snapping is off during the drag so the strip tracks
+       the pointer, and back on at release to settle on a card. */
+    let dragging = false;
+    let originX = 0;
+    let originScroll = 0;
+    let travel = 0;
+
+    rail.addEventListener("pointerdown", (event) => {
+      if (event.pointerType !== "mouse" || event.button !== 0) return;
+      dragging = true;
+      travel = 0;
+      originX = event.clientX;
+      originScroll = rail.scrollLeft;
+    });
+
+    rail.addEventListener("pointermove", (event) => {
+      if (!dragging) return;
+      const dx = event.clientX - originX;
+      if (Math.abs(dx) < 3 && !travel) return;
+      travel = Math.max(travel, Math.abs(dx));
+      rail.classList.add("is-dragging");
+      rail.scrollLeft = originScroll - dx;
+      event.preventDefault();
+    });
+
+    const endDrag = () => {
+      if (!dragging) return;
+      dragging = false;
+      rail.classList.remove("is-dragging");
+    };
+
+    ["pointerup", "pointercancel", "pointerleave"].forEach((type) =>
+      rail.addEventListener(type, endDrag),
+    );
+
+    /* Swallow the click that follows a drag so it does not open the lightbox. */
+    rail.addEventListener(
+      "click",
+      (event) => {
+        if (travel > 6) {
+          event.stopPropagation();
+          event.preventDefault();
+        }
+        travel = 0;
+      },
+      true,
+    );
+
+    /* ---------------------------------------------------- observation ---- */
+
+    let queued = false;
+    rail.addEventListener(
+      "scroll",
+      () => {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(() => {
+          queued = false;
+          update();
+        });
+      },
+      { passive: true },
+    );
+
+    if ("ResizeObserver" in window) {
+      new ResizeObserver(() => measure()).observe(rail);
+    } else {
+      window.addEventListener("resize", measure);
+    }
+
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            onScreen = entry.isIntersecting;
+          });
+          update();
+        },
+        { threshold: 0.05 },
+      ).observe(rail);
+    }
+
+    measure();
+    carousel.dataset.railReady = "true";
+  });
 };
 
-const setupScrollProgress = () => {
-  const update = () => {
-    const scrollTop = window.scrollY;
-    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    const progress = maxScroll > 0 ? (scrollTop / maxScroll) * 100 : 0;
-    document.documentElement.style.setProperty("--scroll-progress", `${progress}%`);
+/* ----------------------------------------------------------- lightbox ----- */
+
+const setupLightbox = () => {
+  const lightbox = document.getElementById("lightbox");
+  const video = document.getElementById("lightboxVideo");
+  const caption = document.getElementById("lightboxCaption");
+  const prev = document.getElementById("lightboxPrev");
+  const next = document.getElementById("lightboxNext");
+  if (!lightbox || !video) return;
+
+  let group = [];
+  let index = -1;
+
+  const sourceOf = (figure) => {
+    const clipVideo = figure.querySelector("video");
+    return clipVideo?.getAttribute("src") || clipVideo?.dataset.src || "";
   };
 
-  update();
-  window.addEventListener("scroll", update, { passive: true });
-  window.addEventListener("resize", update);
+  const labelOf = (figure) =>
+    figure.querySelector("figcaption")?.textContent.trim().replace(/\s+/g, " ") || "";
+
+  const syncNav = () => {
+    const many = group.length > 1;
+    [prev, next].forEach((button) => {
+      if (button) button.hidden = !many;
+    });
+    if (prev) prev.disabled = index <= 0;
+    if (next) next.disabled = index >= group.length - 1;
+  };
+
+  const show = (i) => {
+    const figure = group[i];
+    const src = figure && sourceOf(figure);
+    if (!src) return;
+
+    index = i;
+    video.src = src;
+    if (caption) caption.textContent = labelOf(figure);
+    video.play().catch(() => {});
+    syncNav();
+
+    /* Move the strip along with the lightbox, so closing it lands on the
+       clip that was last on screen. */
+    if (figure.closest("[data-rail]")) {
+      figure.scrollIntoView({ block: "nearest", inline: "center", behavior: scrollMode() });
+    }
+  };
+
+  const close = () => {
+    if (!lightbox.classList.contains("is-open")) return;
+    lightbox.classList.remove("is-open");
+    lightbox.setAttribute("aria-hidden", "true");
+    video.pause();
+    video.removeAttribute("src");
+    if (caption) caption.textContent = "";
+    document.documentElement.style.overflow = "";
+    group = [];
+    index = -1;
+  };
+
+  const step = (direction) => {
+    const target = index + direction;
+    if (target < 0 || target >= group.length) return;
+    show(target);
+  };
+
+  document.addEventListener("click", (event) => {
+    const media = event.target.closest(".clip-media");
+    if (!media) return;
+
+    const figure = media.closest(".clip");
+    if (!figure || !sourceOf(figure)) return;
+
+    /* Siblings of the clicked clip become the lightbox's playlist. */
+    const container = figure.closest("[data-rail]") || figure.closest(".clip-grid");
+    group = container ? [...container.querySelectorAll(".clip")] : [figure];
+    const start = Math.max(0, group.indexOf(figure));
+
+    lightbox.classList.add("is-open");
+    lightbox.setAttribute("aria-hidden", "false");
+    document.documentElement.style.overflow = "hidden";
+    show(start);
+  });
+
+  prev?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    step(-1);
+  });
+
+  next?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    step(1);
+  });
+
+  lightbox.querySelector(".lightbox-close")?.addEventListener("click", close);
+  lightbox.addEventListener("click", (event) => {
+    if (event.target === lightbox || event.target.classList.contains("lightbox-inner")) close();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      close();
+      return;
+    }
+    if (!lightbox.classList.contains("is-open")) return;
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      step(-1);
+    } else if (event.key === "ArrowRight") {
+      event.preventDefault();
+      step(1);
+    }
+  });
 };
 
-const setupActiveNav = () => {
-  const links = [...document.querySelectorAll(".site-nav a[href^='#']")];
-  const sections = links
-    .map((link) => {
-      const id = link.getAttribute("href").slice(1);
-      const section = document.getElementById(id);
-      return section ? { link, section } : null;
-    })
-    .filter(Boolean);
-
-  if (!sections.length || !("IntersectionObserver" in window)) return;
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        links.forEach((link) => link.classList.remove("is-active"));
-        const match = sections.find(({ section }) => section === entry.target);
-        if (match) match.link.classList.add("is-active");
-      });
-    },
-    { rootMargin: "-20% 0px -65% 0px", threshold: 0 },
-  );
-
-  sections.forEach(({ section }) => observer.observe(section));
-};
-
-renderHeroShowcase();
-renderExampleGallery();
-setupVideoLightbox();
-setupGalleryCollapse();
+setupSequenceViewer();
 setupVideoPlayback();
-setupHeroSpotlight();
-setupReveal();
-setupScrollProgress();
-setupActiveNav();
+setupClipRails();
+setupLightbox();

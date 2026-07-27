@@ -5,500 +5,599 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="TrackEverything: Dense 3D Point Tracking in Long Videos via 3D Scene Representations">
     <meta name="keywords" content="TrackEverything, dense tracking, 3D point tracking, long video, scene representation, voxelization, TAPVid-3D">
-    <title>TrackEverything | Dense 3D Point Tracking in Long Videos</title>
+    <title>TrackEverything: Dense 3D Point Tracking in Long Videos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="scroll-progress" aria-hidden="true"></div>
 
-    <main id="top">
-        <section class="hero-shell section-shell">
-            <div class="hero-panel">
-                <header class="site-header">
-                    <a class="brand" href="#top" aria-label="TrackEverything home">
-                        <span class="brand-mark" aria-hidden="true"></span>
-                        <span>TrackEverything</span>
-                    </a>
-                    <span class="header-rule" aria-hidden="true"></span>
-                    <nav class="site-nav" aria-label="Primary navigation">
-                        <a href="#results">Results</a>
-                        <a href="#method">Method</a>
-                        <a href="#visualizations">Visualizations</a>
-                        <a href="#benchmark">Benchmark</a>
-                        <a href="https://arxiv.org/" target="_blank" rel="noopener">Paper</a>
-                    </nav>
-                </header>
+    <!-- ================================ Hero ================================ -->
+    <header class="hero">
+        <div class="container">
+            <h1>
+                <span class="method-name">TrackEverything</span>:<br>
+                Dense 3D Point Tracking in Long Videos via 3D Scene Representations
+            </h1>
 
-                <aside class="hero-teaser" aria-label="TrackEverything tracking visualizations">
-                    <div id="heroShowcase" class="hero-showcase"></div>
-                    <p class="hero-teaser-hint">Click any clip to open an enlarged view.</p>
-                </aside>
+            <p class="authors">
+                <a href="https://ayushjain1144.github.io/" target="_blank" rel="noopener">Ayush Jain</a><sup>1,2</sup>,
+                <a href="https://sreeharshaparuchur1.github.io/" target="_blank" rel="noopener">Sreeharsha Paruchuri</a><sup>1</sup>,
+                <a href="https://gupta-ish.github.io/" target="_blank" rel="noopener">Ishita Gupta</a><sup>1</sup>,
+                <a href="https://scholar.google.com/citations?user=64vtwkoAAAAJ&amp;hl=en" target="_blank" rel="noopener">Fan Zhang</a><sup>2</sup>,<br>
+                <a href="https://tschmidt23.github.io/" target="_blank" rel="noopener">Tanner Schmidt</a><sup>2</sup>,
+                <a href="https://jakobengel.github.io/" target="_blank" rel="noopener">Jakob Engel</a><sup>2</sup>,
+                <a href="https://www.cs.cmu.edu/~katef/" target="_blank" rel="noopener">Katerina Fragkiadaki</a><sup>1</sup>,
+                <a href="https://adamharley.com/" target="_blank" rel="noopener">Adam W. Harley</a><sup>2</sup>
+            </p>
+            <p class="affiliations">
+                <span><sup>1</sup>Carnegie Mellon University</span>
+                <span><sup>2</sup>Meta</span>
+            </p>
 
-                <div class="hero-content paper-header">
-                    <div class="paper-title-row">
-                        <span class="paper-title-lead">
-                            <span class="paper-title-logo" aria-hidden="true"></span>
-                            <h1 class="paper-title">TrackEverything</h1>
-                        </span>
-                    </div>
-                    <p class="paper-subtitle">Dense 3D Point Tracking in Long Videos via 3D Scene Representations</p>
-                    <div class="author-block" aria-label="Paper authors and affiliations">
-                        <p class="author-list">
-                            <span><a href="https://ayushjain1144.github.io/" target="_blank" rel="noopener">Ayush Jain</a><sup>1,2</sup></span>
-                            <span><a href="https://sreeharshaparuchur1.github.io/" target="_blank" rel="noopener">Sreeharsha Paruchuri</a><sup>1</sup></span>
-                            <span><a href="https://gupta-ish.github.io/" target="_blank" rel="noopener">Ishita Gupta</a><sup>1</sup></span>
-                            <span><a href="https://scholar.google.com/citations?user=64vtwkoAAAAJ&amp;hl=en" target="_blank" rel="noopener">Fan Zhang</a><sup>2</sup></span>
-                            <span><a href="https://tschmidt23.github.io/" target="_blank" rel="noopener">Tanner Schmidt</a><sup>2</sup></span>
-                            <span><a href="https://jakobengel.github.io/" target="_blank" rel="noopener">Jakob Engel</a><sup>2</sup></span>
-                            <span><a href="https://www.cs.cmu.edu/~katef/" target="_blank" rel="noopener">Katerina Fragkiadaki</a><sup>1</sup></span>
-                            <span><a href="https://adamharley.com/" target="_blank" rel="noopener">Adam W. Harley</a><sup>2</sup></span>
-                        </p>
-                        <p class="affiliation-list">
-                            <span><sup>1</sup>Carnegie Mellon University</span>
-                            <span><sup>2</sup>Meta</span>
-                        </p>
-                    </div>
-                    <div class="hero-actions" aria-label="Project links">
-                        <a href="assets/alltrack3r.pdf" class="button" target="_blank" rel="noopener">
-                            <i class="fas fa-file-pdf" aria-hidden="true"></i>
-                            <span>PDF</span>
-                        </a>
-                        <a href="https://github.com/" class="button" target="_blank" rel="noopener">
-                            <i class="fab fa-github" aria-hidden="true"></i>
-                            <span>Code</span>
-                        </a>
-                        <a href="https://arxiv.org/" class="button btn-arxiv" target="_blank" rel="noopener" aria-label="arXiv">
-                            <i class="ai ai-arxiv" aria-hidden="true"></i>
-                            <span>arXiv</span>
-                        </a>
-                    </div>
-                </div>
+            <div class="button-group">
+                <a href="assets/alltrack3r.pdf" class="btn" target="_blank" rel="noopener">
+                    <i class="far fa-file-pdf" aria-hidden="true"></i> Paper
+                </a>
+                <a href="https://arxiv.org/" class="btn" target="_blank" rel="noopener">
+                    <i class="ai ai-arxiv" aria-hidden="true"></i> arXiv
+                </a>
+                <a href="https://github.com/" class="btn" target="_blank" rel="noopener">
+                    <i class="fab fa-github" aria-hidden="true"></i> Code
+                </a>
             </div>
-        </section>
+        </div>
+    </header>
 
-        <section id="results" class="top-leaderboard section-shell" aria-label="Key results">
-            <div class="leaderboard-head">
-                <p class="kicker">Results</p>
-                <h2>Scaling dense 3D tracking to full-length video.</h2>
-                <p class="leaderboard-lede">
-                    TrackEverything is the first dense 3D point tracker that tracks
-                    <strong>all points across all frames</strong> in videos of 1000+ frames —
-                    outperforming open-source dense 3D trackers by over
-                    <strong>20% APD</strong> on TAPVid-3D while running in under
-                    <strong>40 GB</strong> of GPU memory.
+    <!-- ============================== Teaser =============================== -->
+    <section class="section">
+        <div class="container container-wide">
+            <div class="highlights">
+                <p class="highlight">
+                    <span><strong>TrackEverything</strong> tracks <strong>all points across all frames</strong> of videos
+                    with <strong>1000+ frames</strong> by representing the video as persistent 3D scene tracks in world
+                    coordinates.</span>
                 </p>
-                <div class="leaderboard-side-stats" aria-label="Headline numbers">
-                    <article style="--score: 100;">
-                        <span>APD gain</span>
-                        <strong>+20%</strong>
-                        <small>over open dense 3D trackers</small>
-                        <i><b></b></i>
-                    </article>
-                    <article style="--score: 85;">
-                        <span>Video length</span>
-                        <strong>1000+</strong>
-                        <small>frames of dense tracking</small>
-                        <i><b></b></i>
-                    </article>
-                    <article style="--score: 65;">
-                        <span>GPU memory</span>
-                        <strong>&lt;40 GB</strong>
-                        <small>peak at 1000+ frames</small>
-                        <i><b></b></i>
-                    </article>
-                </div>
+                <p class="highlight">
+                    <span>It outperforms open-source dense 3D trackers by over <strong>20% APD</strong> on TAPVid-3D
+                    while staying under <strong>40 GB</strong> of peak GPU memory with only <strong>61M</strong>
+                    parameters.</span>
+                </p>
             </div>
 
-            <div class="leaderboard-board">
-                <figure class="arch-card">
-                    <img src="assets/arch_v1.png" alt="TrackEverything architecture diagram">
-                    <figcaption>
-                        <strong>TrackEverything architecture.</strong> Given a video and associated depth and camera
-                        parameters, TrackEverything encodes each image with DINOv3 and lifts it to a 3D feature cloud.
-                        An EndPoint Refiner transformer attends in the 3D feature cloud and produces flow estimates,
-                        static/dynamic masks, and visibility. A trajectory refiner then decodes full dense tracks for
-                        dynamic points across the video.
-                    </figcaption>
+            <div class="media-frame is-teaser">
+                <video src="assets/results/results.mp4" muted loop playsinline autoplay
+                       preload="metadata" data-autoplay></video>
+            </div>
+            <p class="media-caption">
+                Dense 3D point tracking results across DAVIS, driving, and in-the-wild sequences.
+                Left: the reconstructed 3D scene tracks. Right: the same tracks rendered in the input view.
+            </p>
+        </div>
+    </section>
+
+    <!-- ============================== Abstract ============================= -->
+    <section class="section">
+        <div class="container">
+            <h2>Abstract</h2>
+            <div class="body-copy">
+                <p>
+                    Videos are 2D projections of a persistent 3D world, yet most tracking methods operate in pixel
+                    space, redundantly re-representing the same surfaces across frames. We introduce
+                    <strong>TrackEverything</strong>, a dense 3D point tracker that represents videos as persistent
+                    3D scene tracks in world coordinates. Our approach combines three ideas: (1) tracking in 3D
+                    scene-content space, where repeated observations of the same surface are fused and occluded points
+                    persist without redundant representation; (2) a recurrent architecture that iteratively refines
+                    motion estimates and chains predictions across sliding windows for long-video inference; and
+                    (3) per-window static/dynamic classification that allocates trajectory decoding only to points in
+                    motion. At each window boundary, the 3D representation is voxelized to remove redundant points,
+                    ensuring model complexity scales with distinct scene content rather than video length. The result
+                    is the first dense 3D point tracker that tracks all points across all frames in videos of 1000+
+                    frames, outperforming open-source dense 3D trackers by over 20% APD on TAPVid-3D while running in
+                    under 40 GB of GPU memory.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================== Method ============================== -->
+    <section class="section section-alt">
+        <div class="container container-wide">
+            <h2>Method</h2>
+            <p class="section-intro">
+                Architecture overview: a 3D feature cloud is refined by an EndPoint Refiner and decoded into dense
+                trajectories only where the scene moves.
+            </p>
+            <figure class="figure-frame">
+                <img src="assets/arch_v1.png" alt="TrackEverything architecture diagram">
+            </figure>
+            <figcaption>
+                Given a video with associated depth and camera parameters, TrackEverything encodes each image with
+                DINOv3 and lifts it into a 3D feature cloud. An EndPoint Refiner transformer attends within the 3D
+                feature cloud and predicts flow, static/dynamic masks, and visibility. A trajectory refiner then
+                decodes full dense tracks for the dynamic points across the video.
+            </figcaption>
+        </div>
+    </section>
+
+    <!-- =========================== Visualizations ========================== -->
+    <section class="section">
+        <div class="container container-wide">
+            <h2>Dense 3D Tracking Results</h2>
+            <p class="section-intro">
+                Select a sequence to load its visualization. Left: dense 3D scene tracks viewed from a moving camera.
+                Right: the same tracks rendered in the input view.
+            </p>
+
+            <div class="media-frame is-viewer">
+                <video id="viewerVideo" src="assets/davis_dance-twirl.mp4" muted loop playsinline autoplay
+                       preload="metadata" data-autoplay></video>
+            </div>
+
+            <div class="sequence-list" id="sequenceList">
+                <button type="button" class="sequence-item is-active" data-video="assets/davis_dance-twirl.mp4">
+                    Dance Twirl<span class="sequence-source">DAVIS</span>
+                </button>
+                <button type="button" class="sequence-item" data-video="assets/twirl_1.mp4">
+                    Twirl<span class="sequence-source">DAVIS</span>
+                </button>
+                <button type="button" class="sequence-item" data-video="assets/davis_libby_mask.mp4">
+                    Libby<span class="sequence-source">DAVIS</span>
+                </button>
+                <button type="button" class="sequence-item" data-video="assets/davis_cow.mp4">
+                    Cow<span class="sequence-source">DAVIS</span>
+                </button>
+                <button type="button" class="sequence-item" data-video="assets/davis-drive-chicane.mp4">
+                    Drive Chicane<span class="sequence-source">DAVIS</span>
+                </button>
+                <button type="button" class="sequence-item" data-video="assets/soap-box.mp4">
+                    Soap Box<span class="sequence-source">In the wild</span>
+                </button>
+                <button type="button" class="sequence-item" data-video="assets/pstudio_1.mp4">
+                    Portrait Studio<span class="sequence-source">PStudio</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================== Quantitative results ======================= -->
+    <section class="section section-alt">
+        <div class="container container-wide">
+            <h2>Quantitative Results</h2>
+            <p class="section-intro">
+                TAPVid-3D evaluation on the <em>first 48 frames</em> (short clips) and on <em>full-length video</em>.
+                TrackEverything is the only dense method that runs on full-length sequences. Bold marks the best open
+                dense method per column.
+            </p>
+
+            <div class="table-scroll">
+                <table class="results">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" class="method">Method</th>
+                            <th colspan="6" class="group">First 48 Frames</th>
+                            <th colspan="6" class="group">Full-Length Video</th>
+                        </tr>
+                        <tr>
+                            <th>ADT<small>APD-P</small></th>
+                            <th>ADT<small>APD-M</small></th>
+                            <th>DriveTrk<small>APD-P</small></th>
+                            <th>DriveTrk<small>APD-M</small></th>
+                            <th>PStudio<small>APD-P</small></th>
+                            <th>PStudio<small>APD-M</small></th>
+                            <th>ADT<small>APD-P</small></th>
+                            <th>ADT<small>APD-M</small></th>
+                            <th>DriveTrk<small>APD-P</small></th>
+                            <th>DriveTrk<small>APD-M</small></th>
+                            <th>PStudio<small>APD-P</small></th>
+                            <th>PStudio<small>APD-M</small></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="group-row">
+                            <td colspan="13">Sparse tracking baselines</td>
+                        </tr>
+                        <tr>
+                            <td class="method">CoTracker3 + Pi3</td>
+                            <td>38.7</td><td>88.0</td><td>29.2</td><td>41.9</td><td>23.7</td><td>83.1</td>
+                            <td>31.4</td><td>82.3</td><td>24.3</td><td>40.5</td><td>18.7</td><td>80.2</td>
+                        </tr>
+                        <tr>
+                            <td class="method">SpatialTracker-v2 + Pi3</td>
+                            <td>39.9</td><td>88.1</td><td>29.8</td><td>42.5</td><td>20.6</td><td>80.7</td>
+                            <td>32.1</td><td>82.4</td><td>26.2</td><td>43.5</td><td>17.2</td><td>78.5</td>
+                        </tr>
+                        <tr>
+                            <td class="method">TAPIP-3D + Pi3</td>
+                            <td>39.6</td><td>88.5</td><td>28.5</td><td>41.0</td><td>23.9</td><td>83.4</td>
+                            <td>32.7</td><td>82.0</td><td>25.0</td><td>40.9</td><td>19.1</td><td>80.7</td>
+                        </tr>
+                        <tr class="group-row">
+                            <td colspan="13">Dense tracking baselines</td>
+                        </tr>
+                        <tr>
+                            <td class="method">Any4D + Pi3</td>
+                            <td>5.1</td><td>61.5</td><td>2.6</td><td>5.4</td><td>4.2</td><td>66.0</td>
+                            <td colspan="6" class="na">N/A (out of memory)</td>
+                        </tr>
+                        <tr>
+                            <td class="method">VDPM</td>
+                            <td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td>
+                            <td colspan="6" class="na">N/A</td>
+                        </tr>
+                        <tr class="ours">
+                            <td class="method">TrackEverything (Ours)</td>
+                            <td>40.0</td><td>89.1</td><td>26.7</td><td>38.8</td><td>22.7</td><td>83.4</td>
+                            <td>30.5</td><td>81.6</td><td>23.7</td><td>39.6</td><td>17.8</td><td>80.4</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="footnote">
+                D4RT (closed-source, 1B parameters) achieves higher APD-P on 48-frame clips but has not been evaluated
+                beyond 48 frames. TrackEverything uses 61M parameters and is trained on publicly available datasets only.
+            </p>
+        </div>
+    </section>
+
+    <!-- ====================== Qualitative comparisons ====================== -->
+    <section class="section">
+        <div class="container container-wide">
+            <h2>More Qualitative Results</h2>
+            <p class="section-intro">
+                Dense 3D tracks rendered in the input view on 29 DAVIS and MeVis sequences. Drag or
+                scroll the strip to see the rest; click any clip to enlarge.
+            </p>
+
+            <div class="clip-carousel" data-carousel>
+                <div class="rail-shell">
+                    <button type="button" class="rail-nav rail-nav-prev" data-rail-prev
+                            aria-label="Previous clips">&lsaquo;</button>
+                    <div class="clip-rail" data-rail tabindex="0" role="group"
+                         aria-label="Qualitative result clips (scroll horizontally)">
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/davis_horsejump-low.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">DAVIS</span>Horsejump Low</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/davis_stroller.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">DAVIS</span>Stroller</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/davis_train.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">DAVIS</span>Train</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/mevis_9f542dded87c.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">MeVis</span>Sequence 9f542dde</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/mevis_dcaa317f9fe2.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">MeVis</span>Sequence dcaa317f</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/mevis_f610df51c78a.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">MeVis</span>Sequence f610df51</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/davis_blackswan.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">DAVIS</span>Blackswan</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/davis_car-roundabout.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">DAVIS</span>Car Roundabout</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/davis_car-shadow.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">DAVIS</span>Car Shadow</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/davis_car-turn.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">DAVIS</span>Car Turn</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/davis_dance-twirl.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">DAVIS</span>Dance Twirl</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/davis_dog.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">DAVIS</span>Dog</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/davis_hockey.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">DAVIS</span>Hockey</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/davis_kite-surf.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">DAVIS</span>Kite Surf</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/davis_lucia.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">DAVIS</span>Lucia</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/davis_mallard_fly.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">DAVIS</span>Mallard Fly</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/davis_mallard_water.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">DAVIS</span>Mallard Water</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/davis_soccerball.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">DAVIS</span>Soccerball</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/mevis_2be7a463bbbf.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">MeVis</span>Sequence 2be7a463</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/mevis_410dae675d9a.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">MeVis</span>Sequence 410dae67</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/mevis_521a90b654ca.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">MeVis</span>Sequence 521a90b6</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/mevis_6eac00b5f389.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">MeVis</span>Sequence 6eac00b5</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/mevis_7cf6ec02d710.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">MeVis</span>Sequence 7cf6ec02</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/mevis_8a3ceef4f248.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">MeVis</span>Sequence 8a3ceef4</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/mevis_a9402f575b5c.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">MeVis</span>Sequence a9402f57</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/mevis_d56a6ec78cfa.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">MeVis</span>Sequence d56a6ec7</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/mevis_d6c1a055ae91.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">MeVis</span>Sequence d6c1a055</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/mevis_e262e26da29e.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">MeVis</span>Sequence e262e26d</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/good_cases/mevis_e8d09effc9e0.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">MeVis</span>Sequence e8d09eff</figcaption>
+                        </figure>
+                    </div>
+                    <button type="button" class="rail-nav rail-nav-next" data-rail-next
+                            aria-label="Next clips">&rsaquo;</button>
+                </div>
+                <div class="rail-footer">
+                    <div class="rail-dots" data-rail-dots role="tablist" aria-label="Clip pages"></div>
+                    <p class="rail-count" data-rail-count aria-live="polite"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== Static / dynamic classification ================ -->
+    <section class="section section-alt">
+        <div class="container container-wide">
+            <h2>Static / Dynamic Classification</h2>
+            <p class="section-intro">
+                Per-window classification decides where trajectories are decoded. Red points are classified as
+                dynamic, blue points as static.
+            </p>
+
+            <div class="clip-grid">
+                <figure class="clip">
+                    <div class="clip-media">
+                        <video data-src="assets/static_dynamic/davis_great_breakdance-flare.mp4"
+                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                    </div>
+                    <figcaption><span class="clip-source">DAVIS</span>Breakdance Flare</figcaption>
+                </figure>
+                <figure class="clip">
+                    <div class="clip-media">
+                        <video data-src="assets/static_dynamic/davis_great_dance-jump.mp4"
+                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                    </div>
+                    <figcaption><span class="clip-source">DAVIS</span>Dance Jump</figcaption>
+                </figure>
+                <figure class="clip">
+                    <div class="clip-media">
+                        <video data-src="assets/static_dynamic/davis_great_tennis.mp4"
+                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                    </div>
+                    <figcaption><span class="clip-source">DAVIS</span>Tennis</figcaption>
+                </figure>
+                <figure class="clip">
+                    <div class="clip-media">
+                        <video data-src="assets/static_dynamic/mevis_great_2fbec459efc2.mp4"
+                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                    </div>
+                    <figcaption><span class="clip-source">MeVis</span>Sequence 2fbec459</figcaption>
+                </figure>
+                <figure class="clip">
+                    <div class="clip-media">
+                        <video data-src="assets/static_dynamic/mevis_great_b4d6cf8c922c.mp4"
+                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                    </div>
+                    <figcaption><span class="clip-source">MeVis</span>Sequence b4d6cf8c</figcaption>
                 </figure>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section id="method" class="content-section">
-            <div class="section-shell">
-                <div class="section-heading compact">
-                    <p class="kicker">Method</p>
-                    <h2>What is TrackEverything?</h2>
-                    <div class="body-copy">
-                        <p>
-                            Videos are 2D projections of a persistent 3D world, yet most tracking methods operate in pixel
-                            space, redundantly re-representing the same surfaces across frames. We introduce
-                            <strong>TrackEverything</strong>, a dense 3D point tracker that represents videos as persistent
-                            3D scene tracks in world coordinates.
-                        </p>
-                        <p>
-                            Our approach combines three ideas: (1) tracking in 3D scene-content space, where repeated
-                            observations of the same surface are fused and occluded points persist without redundant
-                            representation; (2) a recurrent architecture that iteratively refines motion estimates and
-                            chains predictions across sliding windows for long-video inference; and (3) per-window
-                            static/dynamic classification that allocates trajectory decoding only to points in motion.
-                            At each window boundary, the 3D representation is voxelized to remove redundant points,
-                            ensuring model complexity scales with distinct scene content rather than video length.
-                        </p>
+    <!-- ============================ Failure cases ========================== -->
+    <section class="section">
+        <div class="container container-wide">
+            <h2>Failure Cases</h2>
+            <p class="section-intro">
+                Tracking degrades under fast, large-displacement motion and under repetitive or low-texture
+                backgrounds, where the lifted 3D correspondences become ambiguous.
+            </p>
+
+            <div class="clip-grid">
+                <figure class="clip">
+                    <div class="clip-media">
+                        <video data-src="assets/failure_cases/davis_bmx-bumps.mp4"
+                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
                     </div>
-                </div>
-
-                <div class="vstat-stats">
-                    <article class="stat-pill">
-                        <strong>+20%</strong>
-                        <span>APD over open dense 3D</span>
-                    </article>
-                    <article class="stat-pill">
-                        <strong>1000+</strong>
-                        <span>frames tracked densely</span>
-                    </article>
-                    <article class="stat-pill">
-                        <strong>&lt;40 GB</strong>
-                        <span>peak GPU memory</span>
-                    </article>
-                    <article class="stat-pill">
-                        <strong>61M</strong>
-                        <span>parameters</span>
-                    </article>
-                </div>
-            </div>
-        </section>
-
-        <section id="visualizations" class="content-section examples-section">
-            <div class="section-shell">
-                <div class="vstat-examples">
-                    <div class="vstat-examples-head">
-                        <p class="kicker">Visualizations</p>
-                        <h3>A glimpse across <span class="task-count">7</span> sequences.</h3>
-                        <p class="vstat-examples-subcopy">
-                            Representative dense 3D tracking results on DAVIS and in-the-wild footage.
-                            <strong>Click any clip</strong> to open an enlarged view with details.
-                        </p>
+                    <figcaption><span class="clip-source">DAVIS</span>BMX Bumps</figcaption>
+                </figure>
+                <figure class="clip">
+                    <div class="clip-media">
+                        <video data-src="assets/failure_cases/davis_scooter-gray.mp4"
+                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
                     </div>
-                    <div id="exampleGallery" class="example-gallery is-collapsed" aria-label="Tracking visualization gallery"></div>
-                    <div class="vstat-examples-actions">
-                        <button
-                            id="exampleToggle"
-                            type="button"
-                            class="example-toggle"
-                            aria-controls="exampleGallery"
-                            aria-expanded="false"
-                        >Show all 7 clips</button>
+                    <figcaption><span class="clip-source">DAVIS</span>Scooter Gray</figcaption>
+                </figure>
+                <figure class="clip">
+                    <div class="clip-media">
+                        <video data-src="assets/failure_cases/mevis_4fddcf8823f0.mp4"
+                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
                     </div>
-                </div>
-
-                <div class="viz-subsections">
-                    <section class="viz-subsection">
-                        <h3 class="viz-subsection-title">
-                            Headline Rerun Visualization
-                            <span class="author-note" data-tag="great">great</span>
-                        </h3>
-                        <ul class="viz-subsection-notes">
-                            <li>DAVIS at 12 fps</li>
-                            <li>MeVis at 4 fps</li>
-                        </ul>
-                    </section>
-
-                    <section class="viz-subsection">
-                        <h3 class="viz-subsection-title">
-                            More Visualizations
-                            <span class="author-note" data-tag="good">good</span>
-                        </h3>
-                        <div class="sd-grid">
-                            <figure class="sd-clip">
-                                <div class="sd-clip-media">
-                                    <video src="assets/good_cases/davis_horsejump-low.mp4"
-                                        muted loop playsinline autoplay preload="metadata"></video>
-                                </div>
-                                <figcaption>
-                                    <span class="sd-clip-source">DAVIS</span>
-                                    <span class="sd-clip-name">Horsejump Low</span>
-                                </figcaption>
-                            </figure>
-                            <figure class="sd-clip">
-                                <div class="sd-clip-media">
-                                    <video src="assets/good_cases/davis_stroller.mp4"
-                                        muted loop playsinline autoplay preload="metadata"></video>
-                                </div>
-                                <figcaption>
-                                    <span class="sd-clip-source">DAVIS</span>
-                                    <span class="sd-clip-name">Stroller</span>
-                                </figcaption>
-                            </figure>
-                            <figure class="sd-clip">
-                                <div class="sd-clip-media">
-                                    <video src="assets/good_cases/davis_train.mp4"
-                                        muted loop playsinline autoplay preload="metadata"></video>
-                                </div>
-                                <figcaption>
-                                    <span class="sd-clip-source">DAVIS</span>
-                                    <span class="sd-clip-name">Train</span>
-                                </figcaption>
-                            </figure>
-                            <figure class="sd-clip">
-                                <div class="sd-clip-media">
-                                    <video src="assets/good_cases/mevis_9f542dded87c.mp4"
-                                        muted loop playsinline autoplay preload="metadata"></video>
-                                </div>
-                                <figcaption>
-                                    <span class="sd-clip-source">MeVis</span>
-                                    <span class="sd-clip-name">Sequence 9f542dde</span>
-                                </figcaption>
-                            </figure>
-                            <figure class="sd-clip">
-                                <div class="sd-clip-media">
-                                    <video src="assets/good_cases/mevis_dcaa317f9fe2.mp4"
-                                        muted loop playsinline autoplay preload="metadata"></video>
-                                </div>
-                                <figcaption>
-                                    <span class="sd-clip-source">MeVis</span>
-                                    <span class="sd-clip-name">Sequence dcaa317f</span>
-                                </figcaption>
-                            </figure>
-                            <figure class="sd-clip">
-                                <div class="sd-clip-media">
-                                    <video src="assets/good_cases/mevis_f610df51c78a.mp4"
-                                        muted loop playsinline autoplay preload="metadata"></video>
-                                </div>
-                                <figcaption>
-                                    <span class="sd-clip-source">MeVis</span>
-                                    <span class="sd-clip-name">Sequence f610df51</span>
-                                </figcaption>
-                            </figure>
-                        </div>
-                    </section>
-
-                    <section class="viz-subsection">
-                        <h3 class="viz-subsection-title">
-                            Failure Cases
-                            <span class="author-note" data-tag="bad">bad</span>
-                        </h3>
-                        <div class="sd-grid">
-                            <figure class="sd-clip">
-                                <div class="sd-clip-media">
-                                    <video src="assets/failure_cases/davis_bmx-bumps.mp4"
-                                        muted loop playsinline autoplay preload="metadata"></video>
-                                </div>
-                                <figcaption>
-                                    <span class="sd-clip-source">DAVIS</span>
-                                    <span class="sd-clip-name">BMX Bumps</span>
-                                </figcaption>
-                            </figure>
-                            <figure class="sd-clip">
-                                <div class="sd-clip-media">
-                                    <video src="assets/failure_cases/davis_scooter-gray.mp4"
-                                        muted loop playsinline autoplay preload="metadata"></video>
-                                </div>
-                                <figcaption>
-                                    <span class="sd-clip-source">DAVIS</span>
-                                    <span class="sd-clip-name">Scooter Gray</span>
-                                </figcaption>
-                            </figure>
-                            <figure class="sd-clip">
-                                <div class="sd-clip-media">
-                                    <video src="assets/failure_cases/mevis_4fddcf8823f0.mp4"
-                                        muted loop playsinline autoplay preload="metadata"></video>
-                                </div>
-                                <figcaption>
-                                    <span class="sd-clip-source">MeVis</span>
-                                    <span class="sd-clip-name">Sequence 4fddcf88</span>
-                                </figcaption>
-                            </figure>
-                        </div>
-                    </section>
-
-                    <section class="viz-subsection">
-                        <h3 class="viz-subsection-title">
-                            Static / Dynamic Classification
-                        </h3>
-                        <p class="viz-subsection-copy">
-                            The red points are classified as dynamic, the blue points are classified as static. Examples on DAVIS and MeVis
-                            sequences below.
-                        </p>
-                        <div class="sd-grid">
-                            <figure class="sd-clip">
-                                <div class="sd-clip-media">
-                                    <video src="assets/static_dynamic/davis_great_breakdance-flare.mp4"
-                                        muted loop playsinline autoplay preload="metadata"></video>
-                                </div>
-                                <figcaption>
-                                    <span class="sd-clip-source">DAVIS</span>
-                                    <span class="sd-clip-name">Breakdance Flare</span>
-                                </figcaption>
-                            </figure>
-                            <figure class="sd-clip">
-                                <div class="sd-clip-media">
-                                    <video src="assets/static_dynamic/davis_great_dance-jump.mp4"
-                                        muted loop playsinline autoplay preload="metadata"></video>
-                                </div>
-                                <figcaption>
-                                    <span class="sd-clip-source">DAVIS</span>
-                                    <span class="sd-clip-name">Dance Jump</span>
-                                </figcaption>
-                            </figure>
-                            <figure class="sd-clip">
-                                <div class="sd-clip-media">
-                                    <video src="assets/static_dynamic/davis_great_tennis.mp4"
-                                        muted loop playsinline autoplay preload="metadata"></video>
-                                </div>
-                                <figcaption>
-                                    <span class="sd-clip-source">DAVIS</span>
-                                    <span class="sd-clip-name">Tennis</span>
-                                </figcaption>
-                            </figure>
-                            <figure class="sd-clip">
-                                <div class="sd-clip-media">
-                                    <video src="assets/static_dynamic/mevis_great_2fbec459efc2.mp4"
-                                        muted loop playsinline autoplay preload="metadata"></video>
-                                </div>
-                                <figcaption>
-                                    <span class="sd-clip-source">MeVis</span>
-                                    <span class="sd-clip-name">Sequence 2fbec459</span>
-                                </figcaption>
-                            </figure>
-                            <figure class="sd-clip">
-                                <div class="sd-clip-media">
-                                    <video src="assets/static_dynamic/mevis_great_b4d6cf8c922c.mp4"
-                                        muted loop playsinline autoplay preload="metadata"></video>
-                                </div>
-                                <figcaption>
-                                    <span class="sd-clip-source">MeVis</span>
-                                    <span class="sd-clip-name">Sequence b4d6cf8c</span>
-                                </figcaption>
-                            </figure>
-                        </div>
-                    </section>
-                </div>
+                    <figcaption><span class="clip-source">MeVis</span>Sequence 4fddcf88</figcaption>
+                </figure>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section id="benchmark" class="content-section">
-            <div class="section-shell">
-                <div class="section-heading compact">
-                    <p class="kicker">Benchmark</p>
-                    <h2>Quantitative results on TAPVid-3D.</h2>
-                    <p>
-                        Evaluation across three datasets in the <em>first 48 frames</em> (short clips) and
-                        <em>full-length video</em> regimes. TrackEverything is the only dense method that runs on
-                        full-length sequences. Bold = best open dense method per column.
-                    </p>
-                </div>
-                <div class="results-table-wrapper">
-                    <table class="results-table">
-                        <thead>
-                            <tr>
-                                <th rowspan="2" class="method-col">Method</th>
-                                <th colspan="6" class="group-header">First 48 Frames</th>
-                                <th colspan="6" class="group-header">Full-Length Video</th>
-                            </tr>
-                            <tr>
-                                <th>ADT<br><small>APD-P</small></th>
-                                <th>ADT<br><small>APD-M</small></th>
-                                <th>DriveTrk<br><small>APD-P</small></th>
-                                <th>DriveTrk<br><small>APD-M</small></th>
-                                <th>PStudio<br><small>APD-P</small></th>
-                                <th>PStudio<br><small>APD-M</small></th>
-                                <th>ADT<br><small>APD-P</small></th>
-                                <th>ADT<br><small>APD-M</small></th>
-                                <th>DriveTrk<br><small>APD-P</small></th>
-                                <th>DriveTrk<br><small>APD-M</small></th>
-                                <th>PStudio<br><small>APD-P</small></th>
-                                <th>PStudio<br><small>APD-M</small></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="section-header">
-                                <td colspan="13">Sparse Tracking Baselines</td>
-                            </tr>
-                            <tr>
-                                <td class="method-col">CoTracker3 + Pi3</td>
-                                <td>38.7</td><td>88.0</td><td>29.2</td><td>41.9</td><td>23.7</td><td>83.1</td>
-                                <td>31.4</td><td>82.3</td><td>24.3</td><td>40.5</td><td>18.7</td><td>80.2</td>
-                            </tr>
-                            <tr>
-                                <td class="method-col">SpatialTracker-v2 + Pi3</td>
-                                <td>39.9</td><td>88.1</td><td>29.8</td><td>42.5</td><td>20.6</td><td>80.7</td>
-                                <td>32.1</td><td>82.4</td><td>26.2</td><td>43.5</td><td>17.2</td><td>78.5</td>
-                            </tr>
-                            <tr>
-                                <td class="method-col">TAPIP-3D + Pi3</td>
-                                <td>39.6</td><td>88.5</td><td>28.5</td><td>41.0</td><td>23.9</td><td>83.4</td>
-                                <td>32.7</td><td>82.0</td><td>25.0</td><td>40.9</td><td>19.1</td><td>80.7</td>
-                            </tr>
-                            <tr class="section-header">
-                                <td colspan="13">Dense Tracking Baselines</td>
-                            </tr>
-                            <tr>
-                                <td class="method-col">Any4D + Pi3</td>
-                                <td>5.1</td><td>61.5</td><td>2.6</td><td>5.4</td><td>4.2</td><td>66.0</td>
-                                <td colspan="6" class="na-cell">N/A (OOM)</td>
-                            </tr>
-                            <tr>
-                                <td class="method-col">VDPM</td>
-                                <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
-                                <td colspan="6" class="na-cell">N/A</td>
-                            </tr>
-                            <tr class="ours">
-                                <td class="method-col">TrackEverything (Ours)</td>
-                                <td class="bold">40.0</td><td class="bold">89.1</td><td class="bold">26.7</td><td class="bold">38.8</td><td class="bold">22.7</td><td class="bold">83.4</td>
-                                <td class="bold">30.5</td><td class="bold">81.6</td><td class="bold">23.7</td><td class="bold">39.6</td><td class="bold">17.8</td><td class="bold">80.4</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <p class="section-footnote">
-                    D4RT (closed-source, 1B parameters) achieves higher APD-P on 48-frame clips but has not been
-                    evaluated beyond 48 frames. TrackEverything uses 61M parameters trained on publicly available
-                    datasets only.
-                </p>
-            </div>
-        </section>
-
-        <section id="citation" class="content-section citation-section">
-            <div class="section-shell">
-                <div class="section-heading compact">
-                    <p class="kicker">Citation</p>
-                    <h2>Reference the paper.</h2>
-                </div>
-                <pre><code>@inproceedings{trackeverything2026,
-  title     = {TrackEverything: Dense 3D Point Tracking in Long Videos via 3D Scene Representations},
+    <!-- ============================== BibTeX =============================== -->
+    <section class="section section-alt">
+        <div class="container">
+            <h2>BibTeX</h2>
+            <div class="citation">
+<pre>@inproceedings{trackeverything2026,
+  title     = {TrackEverything: Dense 3D Point Tracking in Long Videos
+               via 3D Scene Representations},
+  author    = {Jain, Ayush and Paruchuri, Sreeharsha and Gupta, Ishita
+               and Zhang, Fan and Schmidt, Tanner and Engel, Jakob
+               and Fragkiadaki, Katerina and Harley, Adam W.},
   booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
-  year      = {2026},
-}</code></pre>
+  year      = {2026}
+}</pre>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <footer class="site-footer section-shell">
-            <a class="brand" href="#top">
-                <span class="brand-mark" aria-hidden="true"></span>
-                <span>TrackEverything</span>
-            </a>
+    <!-- ============================== Footer =============================== -->
+    <footer class="site-footer">
+        <div class="container">
             <div class="footer-links">
                 <a href="assets/alltrack3r.pdf" target="_blank" rel="noopener">Paper</a>
-                <a href="#benchmark">Benchmark</a>
+                <a href="https://arxiv.org/" target="_blank" rel="noopener">arXiv</a>
                 <a href="https://github.com/" target="_blank" rel="noopener">Code</a>
             </div>
-        </footer>
-    </main>
+            <p>Carnegie Mellon University &middot; Meta</p>
+        </div>
+    </footer>
 
-    <div class="example-lightbox" id="exampleLightbox" role="dialog" aria-modal="true" aria-hidden="true">
-        <button type="button" class="example-lightbox-close" aria-label="Close detail view">&times;</button>
-        <div class="example-lightbox-card" role="document">
-            <div class="example-lightbox-media">
-                <video
-                    class="example-lightbox-video"
-                    controls
-                    playsinline
-                    preload="metadata"
-                ></video>
-            </div>
-            <div class="example-lightbox-body" id="exampleLightboxBody"></div>
+    <!-- ============================= Lightbox ============================== -->
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true">
+        <button type="button" class="lightbox-close" aria-label="Close">&times;</button>
+        <button type="button" class="lightbox-nav lightbox-prev" id="lightboxPrev"
+                aria-label="Previous clip">&lsaquo;</button>
+        <button type="button" class="lightbox-nav lightbox-next" id="lightboxNext"
+                aria-label="Next clip">&rsaquo;</button>
+        <div class="lightbox-inner">
+            <video id="lightboxVideo" controls loop muted playsinline preload="metadata"></video>
+            <p class="lightbox-caption" id="lightboxCaption"></p>
         </div>
     </div>
 

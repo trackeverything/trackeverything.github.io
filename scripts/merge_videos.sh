@@ -39,7 +39,7 @@ if [[ ! -d "$INPUT_DIR" ]]; then
   exit 1
 fi
 
-# Collect inputs (sorted, top-level only — does not recurse).
+# Collect inputs (sorted, top-level only; does not recurse).
 shopt -s nullglob
 mapfile -t INPUTS < <(find "$INPUT_DIR" -maxdepth 1 -type f -iname '*.mp4' | sort)
 shopt -u nullglob
