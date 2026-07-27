@@ -740,6 +740,140 @@ h1.paper-title {
   display: none;
 }
 
+.viz-subsections {
+  display: grid;
+  gap: clamp(40px, 4.5vw, 64px);
+  margin-top: clamp(48px, 5vw, 80px);
+}
+
+.viz-subsection {
+  padding-top: clamp(20px, 2.4vw, 32px);
+  border-top: 1px solid var(--line);
+}
+
+.viz-subsection-title {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin: 0 0 14px;
+  color: var(--ink);
+  font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+  font-weight: 780;
+  letter-spacing: -0.005em;
+  line-height: 1.2;
+}
+
+.author-note {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-style: italic;
+  text-transform: lowercase;
+  opacity: 0.75;
+}
+
+.author-note::before {
+  content: "(";
+}
+
+.author-note::after {
+  content: ")";
+}
+
+.viz-subsection-notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0 0 4px;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+
+.viz-subsection-notes li {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.viz-subsection-copy {
+  max-width: 720px;
+  margin: 0 0 clamp(20px, 2vw, 28px);
+  color: var(--muted);
+  font-size: clamp(0.95rem, 1vw, 1.02rem);
+  line-height: 1.55;
+}
+
+.viz-subsection-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.sd-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(14px, 1.6vw, 22px);
+}
+
+.sd-clip {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sd-clip-media {
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  background: #0f1218;
+  border: 1px solid var(--line);
+}
+
+.sd-clip-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.sd-clip figcaption {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 0.85rem;
+  line-height: 1.3;
+}
+
+.sd-clip-source {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.sd-clip-source::after {
+  content: ":";
+}
+
+.sd-clip-name {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+@media (max-width: 880px) {
+  .sd-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .sd-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .vstat-examples-actions {
   display: flex;
   justify-content: center;
