@@ -136,6 +136,16 @@ strong {
     margin-bottom: 0;
 }
 
+.label-red {
+    color: #c0392b;
+    font-weight: 600;
+}
+
+.label-blue {
+    color: #2471a3;
+    font-weight: 600;
+}
+
 .body-copy {
     max-width: 760px;
     margin: 0 auto;
