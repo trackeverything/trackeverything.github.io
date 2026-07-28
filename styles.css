@@ -276,6 +276,11 @@ strong {
     gap: 0.8rem;
 }
 
+.hero .highlights {
+    margin-top: 1.85rem;
+    text-align: left;
+}
+
 .highlight {
     display: flex;
     gap: 0.8rem;
@@ -441,11 +446,23 @@ figcaption,
     cursor: zoom-in;
 }
 
+.clip-media.is-wide {
+    aspect-ratio: 8 / 3;
+}
+
+.clip-media.is-wide video {
+    object-fit: contain;
+}
+
 .clip-media video {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.hero .clip-grid {
+    margin-top: 2rem;
 }
 
 .clip figcaption {
