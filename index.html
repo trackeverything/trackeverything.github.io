@@ -68,14 +68,14 @@
                 </p>
             </div>
 
-            <div class="media-frame is-teaser">
+            <!-- <div class="media-frame is-teaser">
                 <video src="assets/results/results.mp4" muted loop playsinline autoplay
                        preload="metadata" data-autoplay></video>
             </div>
             <p class="media-caption">
                 Dense 3D point tracking results across DAVIS, driving, and in-the-wild sequences.
                 Left: the reconstructed 3D scene tracks. Right: the same tracks rendered in the input view.
-            </p>
+            </p> -->
         </div>
     </section>
 
@@ -120,46 +120,6 @@
                 feature cloud and predicts flow, static/dynamic masks, and visibility. A trajectory refiner then
                 decodes full dense tracks for the dynamic points across the video.
             </figcaption>
-        </div>
-    </section>
-
-    <!-- =========================== Visualizations ========================== -->
-    <section class="section">
-        <div class="container container-wide">
-            <h2>Dense 3D Tracking Results</h2>
-            <p class="section-intro">
-                Select a sequence to load its visualization. Left: dense 3D scene tracks viewed from a moving camera.
-                Right: the same tracks rendered in the input view.
-            </p>
-
-            <div class="media-frame is-viewer">
-                <video id="viewerVideo" src="assets/davis_dance-twirl.mp4" muted loop playsinline autoplay
-                       preload="metadata" data-autoplay></video>
-            </div>
-
-            <div class="sequence-list" id="sequenceList">
-                <button type="button" class="sequence-item is-active" data-video="assets/davis_dance-twirl.mp4">
-                    Dance Twirl<span class="sequence-source">DAVIS</span>
-                </button>
-                <button type="button" class="sequence-item" data-video="assets/twirl_1.mp4">
-                    Twirl<span class="sequence-source">DAVIS</span>
-                </button>
-                <button type="button" class="sequence-item" data-video="assets/davis_libby_mask.mp4">
-                    Libby<span class="sequence-source">DAVIS</span>
-                </button>
-                <button type="button" class="sequence-item" data-video="assets/davis_cow.mp4">
-                    Cow<span class="sequence-source">DAVIS</span>
-                </button>
-                <button type="button" class="sequence-item" data-video="assets/davis-drive-chicane.mp4">
-                    Drive Chicane<span class="sequence-source">DAVIS</span>
-                </button>
-                <button type="button" class="sequence-item" data-video="assets/soap-box.mp4">
-                    Soap Box<span class="sequence-source">In the wild</span>
-                </button>
-                <button type="button" class="sequence-item" data-video="assets/pstudio_1.mp4">
-                    Portrait Studio<span class="sequence-source">PStudio</span>
-                </button>
-            </div>
         </div>
     </section>
 
@@ -249,7 +209,7 @@
         <div class="container container-wide">
             <h2>More Qualitative Results</h2>
             <p class="section-intro">
-                Dense 3D tracks rendered in the input view on 29 DAVIS and MeVis sequences. Drag or
+                Dense 3D tracks rendered in the input view on 28 DAVIS and MeVis sequences. Drag or
                 scroll the strip to see the rest; click any clip to enlarge.
             </p>
 
@@ -257,7 +217,7 @@
                 <div class="rail-shell">
                     <button type="button" class="rail-nav rail-nav-prev" data-rail-prev
                             aria-label="Previous clips">&lsaquo;</button>
-                    <div class="clip-rail" data-rail tabindex="0" role="group"
+                    <div class="clip-rail clip-rail-2row" data-rail tabindex="0" role="group"
                          aria-label="Qualitative result clips (scroll horizontally)">
                         <figure class="clip">
                             <div class="clip-media">
@@ -373,13 +333,6 @@
                         </figure>
                         <figure class="clip">
                             <div class="clip-media">
-                                <video data-src="assets/good_cases/davis_mallard_water.mp4"
-                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
-                            </div>
-                            <figcaption><span class="clip-source">DAVIS</span>Mallard Water</figcaption>
-                        </figure>
-                        <figure class="clip">
-                            <div class="clip-media">
                                 <video data-src="assets/good_cases/davis_soccerball.mp4"
                                        muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
                             </div>
@@ -482,57 +435,126 @@
                 Per-window classification decides where trajectories are decoded.
                 <span class="label-red">Red</span> points are classified as dynamic,
                 <span class="label-blue">blue</span> points as static.
+                Drag or scroll the strip to see the rest; click any clip to enlarge.
             </p>
 
-            <div class="clip-grid">
-                <figure class="clip">
-                    <div class="clip-media">
-                        <video data-src="assets/static_dynamic/davis_great_breakdance-flare.mp4"
-                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+            <div class="clip-carousel" data-carousel>
+                <div class="rail-shell">
+                    <button type="button" class="rail-nav rail-nav-prev" data-rail-prev
+                            aria-label="Previous clips">&lsaquo;</button>
+                    <div class="clip-rail clip-rail-2row" data-rail tabindex="0" role="group"
+                         aria-label="Static / dynamic classification clips (scroll horizontally)">
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/static_dynamic/davis_great_breakdance-flare.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">DAVIS</span>Breakdance Flare</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/static_dynamic/davis_great_dance-jump.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">DAVIS</span>Dance Jump</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/static_dynamic/mevis_good_410dae675d9a.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">MeVis</span>Sequence 410dae67</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/static_dynamic/mevis_great_7fd5537074bd.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">MeVis</span>Sequence 7fd55370</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/static_dynamic/mevis_great_b8ce22e26dde.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">MeVis</span>Sequence b8ce22e2</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/static_dynamic/mevis_good_d6c1a055ae91.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">MeVis</span>Sequence d6c1a055</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/static_dynamic/pstudio_static_dynamic.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">PStudio</span>Portrait Studio 1</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/static_dynamic/pstudio_static_dynamic_2.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">PStudio</span>Portrait Studio 2</figcaption>
+                        </figure>
                     </div>
-                    <figcaption><span class="clip-source">DAVIS</span>Breakdance Flare</figcaption>
-                </figure>
-                <figure class="clip">
-                    <div class="clip-media">
-                        <video data-src="assets/static_dynamic/davis_great_dance-jump.mp4"
-                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                    <button type="button" class="rail-nav rail-nav-next" data-rail-next
+                            aria-label="Next clips">&rsaquo;</button>
+                </div>
+                <div class="rail-footer">
+                    <div class="rail-dots" data-rail-dots role="tablist" aria-label="Clip pages"></div>
+                    <p class="rail-count" data-rail-count aria-live="polite"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================== Long video evals ========================= -->
+    <section class="section">
+        <div class="container container-wide">
+            <h2>Long Video Evaluation</h2>
+            <p class="section-intro">
+                Masks and dense tracks on full-length Portrait Studio sequences.
+                Drag or scroll the strip to see the rest; click any clip to enlarge.
+            </p>
+
+            <div class="clip-carousel" data-carousel>
+                <div class="rail-shell">
+                    <button type="button" class="rail-nav rail-nav-prev" data-rail-prev
+                            aria-label="Previous clips">&lsaquo;</button>
+                    <div class="clip-rail" data-rail tabindex="0" role="group"
+                         aria-label="Long video evaluation clips (scroll horizontally)">
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/long_video/pod_long_sd.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">PStudio</span>Static / Dynamic Masks 1</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/long_video/pod_long_sd_01.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption><span class="clip-source">PStudio</span>Static / Dynamic Masks 2</figcaption>
+                        </figure>
                     </div>
-                    <figcaption><span class="clip-source">DAVIS</span>Dance Jump</figcaption>
-                </figure>
-                <figure class="clip">
-                    <div class="clip-media">
-                        <video data-src="assets/static_dynamic/mevis_good_410dae675d9a.mp4"
-                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
-                    </div>
-                    <figcaption><span class="clip-source">MeVis</span>Sequence 410dae67</figcaption>
-                </figure>
-                <figure class="clip">
-                    <div class="clip-media">
-                        <video data-src="assets/static_dynamic/mevis_great_7fd5537074bd.mp4"
-                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
-                    </div>
-                    <figcaption><span class="clip-source">MeVis</span>Sequence 7fd55370</figcaption>
-                </figure>
-                <figure class="clip">
-                    <div class="clip-media">
-                        <video data-src="assets/static_dynamic/mevis_great_b8ce22e26dde.mp4"
-                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
-                    </div>
-                    <figcaption><span class="clip-source">MeVis</span>Sequence b8ce22e2</figcaption>
-                </figure>
-                <figure class="clip">
-                    <div class="clip-media">
-                        <video data-src="assets/static_dynamic/mevis_good_d6c1a055ae91.mp4"
-                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
-                    </div>
-                    <figcaption><span class="clip-source">MeVis</span>Sequence d6c1a055</figcaption>
-                </figure>
+                    <button type="button" class="rail-nav rail-nav-next" data-rail-next
+                            aria-label="Next clips">&rsaquo;</button>
+                </div>
+                <div class="rail-footer">
+                    <div class="rail-dots" data-rail-dots role="tablist" aria-label="Clip pages"></div>
+                    <p class="rail-count" data-rail-count aria-live="polite"></p>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- ============================ Failure cases ========================== -->
-    <section class="section">
+    <section class="section section-alt">
         <div class="container container-wide">
             <h2>Failure Cases</h2>
             <p class="section-intro">
@@ -567,7 +589,7 @@
     </section>
 
     <!-- ============================== BibTeX =============================== -->
-    <section class="section section-alt">
+    <section class="section">
         <div class="container">
             <h2>BibTeX</h2>
             <div class="citation">

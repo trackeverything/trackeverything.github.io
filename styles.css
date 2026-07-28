@@ -514,10 +514,12 @@ figcaption,
 
 .clip-rail {
     --per-view: 3;
+    --rail-rows: 1;
     --rail-gap: 1.1rem;
 
     display: grid;
     grid-auto-flow: column;
+    grid-template-rows: repeat(var(--rail-rows), auto);
     grid-auto-columns: calc((100% - (var(--per-view) - 1) * var(--rail-gap)) / var(--per-view));
     gap: var(--rail-gap);
     overflow-x: auto;
@@ -536,6 +538,12 @@ figcaption,
     outline: 2px solid var(--accent);
     outline-offset: 4px;
     border-radius: var(--radius);
+}
+
+/* Two clips deep: a page becomes --per-view columns by two rows. Column flow
+   means DOM order runs down each column before moving right. */
+.clip-rail-2row {
+    --rail-rows: 2;
 }
 
 .clip-rail > .clip {
