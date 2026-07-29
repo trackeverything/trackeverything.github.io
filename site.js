@@ -358,9 +358,17 @@ const setupLightbox = () => {
 
     index = i;
     video.src = src;
+    /* Grid clips stay muted for autoplay; unmute in the lightbox when
+       the source clip carries an audio track (data-has-audio). */
+    const clipVideo = figure.querySelector("video");
+    video.muted = !clipVideo?.hasAttribute("data-has-audio");
     applyPlaybackRate(video);
     if (caption) caption.textContent = labelOf(figure);
-    video.play().catch(() => {});
+    video.play().catch(() => {
+      /* Autoplay with sound can be blocked; keep controls so the user can start. */
+      video.muted = true;
+      video.play().catch(() => {});
+    });
     syncNav();
 
     /* Move the strip along with the lightbox, so closing it lands on the
