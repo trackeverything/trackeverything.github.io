@@ -350,6 +350,47 @@
         </div>
     </section>
 
+    <!-- ============================== Ablations ============================ -->
+    <section class="section section-alt">
+        <div class="container container-wide">
+            <h2>Ablations</h2>
+            <p class="section-intro">
+                Without iterative refinement or WAFT, tracks fragment or drift on fast motion;
+                enabling each recovers coherent long trails.
+            </p>
+
+            <div class="ablation-figure">
+                <div class="ablation-panel">
+                    <h3 class="ablation-panel-title">(a) Iterative refinement</h3>
+                    <div class="ablation-grid" role="group" aria-label="Iterative refinement ablation">
+                        <span class="ablation-row-label">w/o refinement</span>
+                        <img src="assets/ablations/iters/baseline/01.png" alt="Without iterative refinement, example 1" loading="lazy">
+                        <img src="assets/ablations/iters/baseline/02.png" alt="Without iterative refinement, example 2" loading="lazy">
+                        <img src="assets/ablations/iters/baseline/03.png" alt="Without iterative refinement, example 3" loading="lazy">
+                        <span class="ablation-row-label">w/ refinement</span>
+                        <img src="assets/ablations/iters/ours/01.png" alt="With iterative refinement, example 1" loading="lazy">
+                        <img src="assets/ablations/iters/ours/02.png" alt="With iterative refinement, example 2" loading="lazy">
+                        <img src="assets/ablations/iters/ours/03.png" alt="With iterative refinement, example 3" loading="lazy">
+                    </div>
+                </div>
+
+                <div class="ablation-panel">
+                    <h3 class="ablation-panel-title">(b) WAFT</h3>
+                    <div class="ablation-grid" role="group" aria-label="WAFT ablation">
+                        <span class="ablation-row-label">w/o WAFT</span>
+                        <img src="assets/ablations/waft/baseline/01.png" alt="Without WAFT, example 1" loading="lazy">
+                        <img src="assets/ablations/waft/baseline/02.png" alt="Without WAFT, example 2" loading="lazy">
+                        <img src="assets/ablations/waft/baseline/03.png" alt="Without WAFT, example 3" loading="lazy">
+                        <span class="ablation-row-label">w/ WAFT</span>
+                        <img src="assets/ablations/waft/ours/01.png" alt="With WAFT, example 1" loading="lazy">
+                        <img src="assets/ablations/waft/ours/02.png" alt="With WAFT, example 2" loading="lazy">
+                        <img src="assets/ablations/waft/ours/03.png" alt="With WAFT, example 3" loading="lazy">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ====================== Qualitative comparisons ====================== -->
     <section class="section">
         <div class="container container-wide">
