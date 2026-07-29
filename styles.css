@@ -410,6 +410,43 @@ figcaption,
 }
 
 /* --------------------------------------------------------------------------
+   Plot grid
+   -------------------------------------------------------------------------- */
+
+.plot-legend {
+    max-width: 720px;
+    margin: 1.4rem auto 0;
+}
+
+.plot-legend img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.plot-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.6rem 1.4rem;
+    max-width: 720px;
+    margin: 1.4rem auto 0;
+}
+
+.plot {
+    margin: 0;
+}
+
+.plot .figure-frame {
+    margin: 0;
+    max-width: none;
+    padding: 14px;
+}
+
+.plot figcaption {
+    margin-top: 0.7rem;
+}
+
+/* --------------------------------------------------------------------------
    Clip grid
    -------------------------------------------------------------------------- */
 
@@ -431,6 +468,10 @@ figcaption,
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1.1rem;
     margin-top: 1.4rem;
+}
+
+.clip-grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .clip {
@@ -933,6 +974,10 @@ table.results tbody tr:last-child td {
     }
 
     .clip-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .plot-grid {
         grid-template-columns: 1fr;
     }
 

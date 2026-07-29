@@ -276,6 +276,27 @@
                 Drag or scroll the strip to see the rest; click any clip to enlarge.
             </p>
 
+            <div class="clip-grid clip-grid-3">
+                <figure class="clip">
+                    <div class="clip-media is-wide">
+                        <video data-src="assets/rerun_ours/ours_a2de8ecf0da5.mp4"
+                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                    </div>
+                </figure>
+                <figure class="clip">
+                    <div class="clip-media is-wide">
+                        <video data-src="assets/rerun_ours/ours_b4d6cf8c922c.mp4"
+                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                    </div>
+                </figure>
+                <figure class="clip">
+                    <div class="clip-media is-wide">
+                        <video data-src="assets/rerun_ours/ours_mevis_tbd.mp4"
+                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                    </div>
+                </figure>
+            </div>
+
             <div class="clip-carousel" data-carousel>
                 <div class="rail-shell">
                     <button type="button" class="rail-nav rail-nav-prev" data-rail-prev
@@ -458,6 +479,54 @@
                     <div class="rail-dots" data-rail-dots role="tablist" aria-label="Clip pages"></div>
                     <p class="rail-count" data-rail-count aria-live="polite"></p>
                 </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ======================== Quantitative evals ========================= -->
+    <section class="section section-alt">
+        <div class="container container-wide">
+            <h2>Quantitative Evals</h2>
+            <p class="section-intro">
+                3D-APD-P and 3D-APD-M on TAPVid-3D as the sequence length and the number of
+                query points are scaled up.
+            </p>
+
+            <div class="plot-legend">
+                <img src="assets/graphs/graphs_legend.png" loading="lazy"
+                     alt="Legend: CoTracker3, Any4D, SpaTrackerV2, DeltaV2-sparse, DeltaV2-dense, Ours">
+            </div>
+
+            <div class="plot-grid">
+                <figure class="plot">
+                    <div class="figure-frame">
+                        <img src="assets/graphs/frames_apdp.png" loading="lazy"
+                             alt="3D-APD-P versus number of frames">
+                    </div>
+                    <figcaption>3D-APD-P: varying the number of frames.</figcaption>
+                </figure>
+                <figure class="plot">
+                    <div class="figure-frame">
+                        <img src="assets/graphs/frames_apdm.png" loading="lazy"
+                             alt="3D-APD-M versus number of frames">
+                    </div>
+                    <figcaption>3D-APD-M: varying the number of frames.</figcaption>
+                </figure>
+                <figure class="plot">
+                    <div class="figure-frame">
+                        <img src="assets/graphs/points_apdp.png" loading="lazy"
+                             alt="3D-APD-P versus number of query points">
+                    </div>
+                    <figcaption>3D-APD-P: varying the number of query points.</figcaption>
+                </figure>
+                <figure class="plot">
+                    <div class="figure-frame">
+                        <img src="assets/graphs/points_apdm.png" loading="lazy"
+                             alt="3D-APD-M versus number of query points">
+                    </div>
+                    <figcaption>3D-APD-M: varying the number of query points.</figcaption>
+                </figure>
             </div>
         </div>
     </section>
