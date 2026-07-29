@@ -1,2 +1,7 @@
 .DS_Store
 assets/graphs/*.webm
+
+# Local Netlify / agent tooling (do not commit)
+.agents/
+.netlify/
+skills-lock.json

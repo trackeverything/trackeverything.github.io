@@ -31,10 +31,28 @@ const setupSequenceViewer = () => {
 
 /* ------------------------------------------------------- lazy playback ----- */
 
+/* Low-FPS qualitative clips play faster so demos feel snappier.
+   DAVIS / PStudio / POD are ~12 fps → 2x (~24 fps effective).
+   MeViS is ~4 fps → 4x (~16 fps effective). */
+const applyPlaybackRate = (video) => {
+  if (!video) return;
+  const src = video.getAttribute("src") || video.dataset.src || "";
+  const isQual =
+    src.includes("/good_cases/") ||
+    src.includes("/failure_cases/") ||
+    src.includes("/static_dynamic/");
+  if (!isQual) {
+    video.playbackRate = 1;
+    return;
+  }
+  video.playbackRate = /mevis_/i.test(src) ? 4 : 2;
+};
+
 const ensureSource = (video) => {
   if (video && !video.getAttribute("src") && video.dataset.src) {
     video.setAttribute("src", video.dataset.src);
   }
+  applyPlaybackRate(video);
 };
 
 const releaseSource = (video) => {
@@ -340,6 +358,7 @@ const setupLightbox = () => {
 
     index = i;
     video.src = src;
+    applyPlaybackRate(video);
     if (caption) caption.textContent = labelOf(figure);
     video.play().catch(() => {});
     syncNav();
