@@ -528,7 +528,7 @@ figcaption,
 
 /* Ours-vs-baselines table: one row per sequence, ours in the rightmost column. */
 .compare-grid {
-    grid-template-columns: 6.5rem repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.8rem 1.1rem;
     align-items: center;
 }
@@ -544,14 +544,6 @@ figcaption,
 
 .compare-col-label.is-ours {
     color: var(--accent);
-}
-
-.compare-row-label {
-    font-size: 0.8rem;
-    font-weight: 500;
-    line-height: 1.3;
-    color: var(--text-soft);
-    text-align: right;
 }
 
 .clip {
@@ -1033,7 +1025,7 @@ table.results tbody tr:last-child td {
     }
 
     .compare-grid {
-        grid-template-columns: 5rem repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .clip-rail {
@@ -1071,7 +1063,7 @@ table.results tbody tr:last-child td {
     }
 
     .compare-grid {
-        grid-template-columns: 3.9rem repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 0.5rem 0.5rem;
     }
 
