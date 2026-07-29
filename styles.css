@@ -550,8 +550,13 @@ figcaption,
     object-fit: cover;
 }
 
-.hero .clip-grid {
+.hero .clip-carousel {
     margin-top: 2rem;
+}
+
+/* Hero rail: 2x2 wide pages (same footprint as the old static hero grid). */
+.hero .clip-rail {
+    --per-view: 2;
 }
 
 .clip figcaption {

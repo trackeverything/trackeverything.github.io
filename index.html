@@ -65,39 +65,37 @@
         </div>
 
         <div class="container container-wide">
-            <div class="clip-grid">
-                <figure class="clip">
-                    <div class="clip-media is-wide">
-                        <video data-src="assets/rerun_ours/basketball.mp4"
-                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
-                    </div>
-                </figure>
-                <figure class="clip">
-                    <div class="clip-media is-wide">
-                        <video data-src="assets/rerun_ours/baseball.mp4"
-                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
-                    </div>
-                </figure>
-                <figure class="clip">
-                    <div class="clip-media is-wide">
-                        <video data-src="assets/rerun_ours/tennis.mp4"
-                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
-                    </div>
-                </figure>
-                <figure class="clip">
-                    <div class="clip-media is-wide">
-                        <video data-src="assets/rerun_ours/pandas_great.mp4"
-                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
-                    </div>
-                </figure>
-            </div>
-
             <div class="clip-carousel" data-carousel>
                 <div class="rail-shell">
                     <button type="button" class="rail-nav rail-nav-prev" data-rail-prev
                             aria-label="Previous clips">&lsaquo;</button>
-                    <div class="clip-rail" data-rail tabindex="0" role="group"
+                    <div class="clip-rail clip-rail-2row" data-rail tabindex="0" role="group"
                          aria-label="Rerun 3D tracking results (scroll horizontally)">
+                        <!-- Column-major order so the first page matches the old 2x2 hero grid. -->
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/rerun_ours/basketball.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/rerun_ours/tennis.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/rerun_ours/baseball.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/rerun_ours/pandas_great.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                        </figure>
                         <figure class="clip">
                             <div class="clip-media is-wide">
                                 <video data-src="assets/rerun_ours/ours-breakdance.mp4"
@@ -350,47 +348,6 @@
         </div>
     </section>
 
-    <!-- ============================== Ablations ============================ -->
-    <section class="section section-alt">
-        <div class="container container-wide">
-            <h2>Ablations</h2>
-            <p class="section-intro">
-                Without iterative refinement or WAFT, tracks fragment or drift on fast motion;
-                enabling each recovers coherent long trails.
-            </p>
-
-            <div class="ablation-figure">
-                <div class="ablation-panel">
-                    <h3 class="ablation-panel-title">(a) Iterative refinement</h3>
-                    <div class="ablation-grid" role="group" aria-label="Iterative refinement ablation">
-                        <span class="ablation-row-label">w/o refinement</span>
-                        <img src="assets/ablations/iters/baseline/01.png" alt="Without iterative refinement, example 1" loading="lazy">
-                        <img src="assets/ablations/iters/baseline/02.png" alt="Without iterative refinement, example 2" loading="lazy">
-                        <img src="assets/ablations/iters/baseline/03.png" alt="Without iterative refinement, example 3" loading="lazy">
-                        <span class="ablation-row-label">w/ refinement</span>
-                        <img src="assets/ablations/iters/ours/01.png" alt="With iterative refinement, example 1" loading="lazy">
-                        <img src="assets/ablations/iters/ours/02.png" alt="With iterative refinement, example 2" loading="lazy">
-                        <img src="assets/ablations/iters/ours/03.png" alt="With iterative refinement, example 3" loading="lazy">
-                    </div>
-                </div>
-
-                <div class="ablation-panel">
-                    <h3 class="ablation-panel-title">(b) WAFT</h3>
-                    <div class="ablation-grid" role="group" aria-label="WAFT ablation">
-                        <span class="ablation-row-label">w/o WAFT</span>
-                        <img src="assets/ablations/waft/baseline/01.png" alt="Without WAFT, example 1" loading="lazy">
-                        <img src="assets/ablations/waft/baseline/02.png" alt="Without WAFT, example 2" loading="lazy">
-                        <img src="assets/ablations/waft/baseline/03.png" alt="Without WAFT, example 3" loading="lazy">
-                        <span class="ablation-row-label">w/ WAFT</span>
-                        <img src="assets/ablations/waft/ours/01.png" alt="With WAFT, example 1" loading="lazy">
-                        <img src="assets/ablations/waft/ours/02.png" alt="With WAFT, example 2" loading="lazy">
-                        <img src="assets/ablations/waft/ours/03.png" alt="With WAFT, example 3" loading="lazy">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- ====================== Qualitative comparisons ====================== -->
     <section class="section">
         <div class="container container-wide">
@@ -587,53 +544,6 @@
     </section>
 
 
-    <!-- ======================== Quantitative evals ========================= -->
-    <section class="section section-alt">
-        <div class="container container-wide">
-            <h2>Quantitative Evals</h2>
-            <p class="section-intro">
-                3D-APD-P and 3D-APD-M on TAPVid-3D as the sequence length and the number of
-                query points are scaled up.
-            </p>
-
-            <div class="plot-legend">
-                <img src="assets/graphs/graphs_legend.png" loading="lazy"
-                     alt="Legend: CoTracker3, Any4D, SpaTrackerV2, DeltaV2-sparse, DeltaV2-dense, Ours">
-            </div>
-
-            <div class="plot-grid">
-                <figure class="plot">
-                    <div class="figure-frame">
-                        <img src="assets/graphs/frames_apdp.png" loading="lazy"
-                             alt="3D-APD-P versus number of frames">
-                    </div>
-                    <figcaption>3D-APD-P: varying the number of frames.</figcaption>
-                </figure>
-                <figure class="plot">
-                    <div class="figure-frame">
-                        <img src="assets/graphs/frames_apdm.png" loading="lazy"
-                             alt="3D-APD-M versus number of frames">
-                    </div>
-                    <figcaption>3D-APD-M: varying the number of frames.</figcaption>
-                </figure>
-                <figure class="plot">
-                    <div class="figure-frame">
-                        <img src="assets/graphs/points_apdp.png" loading="lazy"
-                             alt="3D-APD-P versus number of query points">
-                    </div>
-                    <figcaption>3D-APD-P: varying the number of query points.</figcaption>
-                </figure>
-                <figure class="plot">
-                    <div class="figure-frame">
-                        <img src="assets/graphs/points_apdm.png" loading="lazy"
-                             alt="3D-APD-M versus number of query points">
-                    </div>
-                    <figcaption>3D-APD-M: varying the number of query points.</figcaption>
-                </figure>
-            </div>
-        </div>
-    </section>
-
     <!-- ==================== Static / dynamic classification ================ -->
     <section class="section section-alt">
         <div class="container container-wide">
@@ -723,6 +633,34 @@
         </div>
     </section>
 
+    <!-- ==================== Comparison with baselines ===================== -->
+    <section class="section">
+        <div class="container container-wide">
+            <h2>Comparison with Baselines</h2>
+            <p class="section-intro">
+                Qualitative comparison against prior trackers on the same sequences.
+                Drag or scroll the strip to see the rest; click any clip to enlarge.
+            </p>
+
+            <div class="clip-carousel" data-carousel>
+                <div class="rail-shell">
+                    <button type="button" class="rail-nav rail-nav-prev" data-rail-prev
+                            aria-label="Previous clips">&lsaquo;</button>
+                    <div class="clip-rail clip-rail-2row" data-rail tabindex="0" role="group"
+                         aria-label="Baseline comparison clips (scroll horizontally)">
+                        <!-- Add clips under assets/comparisons/ -->
+                    </div>
+                    <button type="button" class="rail-nav rail-nav-next" data-rail-next
+                            aria-label="Next clips">&rsaquo;</button>
+                </div>
+                <div class="rail-footer">
+                    <div class="rail-dots" data-rail-dots role="tablist" aria-label="Clip pages"></div>
+                    <p class="rail-count" data-rail-count aria-live="polite"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ============================ Failure cases ========================== -->
     <section class="section section-alt">
         <div class="container container-wide">
@@ -751,6 +689,94 @@
                                muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
                     </div>
                 </figure>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================== Quantitative evals ========================= -->
+    <section class="section section-alt">
+        <div class="container container-wide">
+            <h2>Quantitative Evals</h2>
+            <p class="section-intro">
+                3D-APD-P and 3D-APD-M on TAPVid-3D as the sequence length and the number of
+                query points are scaled up.
+            </p>
+
+            <div class="plot-legend">
+                <img src="assets/graphs/graphs_legend.png" loading="lazy"
+                     alt="Legend: CoTracker3, Any4D, SpaTrackerV2, DeltaV2-sparse, DeltaV2-dense, Ours">
+            </div>
+
+            <div class="plot-grid">
+                <figure class="plot">
+                    <div class="figure-frame">
+                        <img src="assets/graphs/frames_apdp.png" loading="lazy"
+                             alt="3D-APD-P versus number of frames">
+                    </div>
+                    <figcaption>3D-APD-P: varying the number of frames.</figcaption>
+                </figure>
+                <figure class="plot">
+                    <div class="figure-frame">
+                        <img src="assets/graphs/frames_apdm.png" loading="lazy"
+                             alt="3D-APD-M versus number of frames">
+                    </div>
+                    <figcaption>3D-APD-M: varying the number of frames.</figcaption>
+                </figure>
+                <figure class="plot">
+                    <div class="figure-frame">
+                        <img src="assets/graphs/points_apdp.png" loading="lazy"
+                             alt="3D-APD-P versus number of query points">
+                    </div>
+                    <figcaption>3D-APD-P: varying the number of query points.</figcaption>
+                </figure>
+                <figure class="plot">
+                    <div class="figure-frame">
+                        <img src="assets/graphs/points_apdm.png" loading="lazy"
+                             alt="3D-APD-M versus number of query points">
+                    </div>
+                    <figcaption>3D-APD-M: varying the number of query points.</figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================== Ablations ============================ -->
+    <section class="section">
+        <div class="container container-wide">
+            <h2>Ablations</h2>
+            <p class="section-intro">
+                Without iterative refinement or WAFT, tracks fragment or drift on fast motion;
+                enabling each recovers coherent long trails.
+            </p>
+
+            <div class="ablation-figure">
+                <div class="ablation-panel">
+                    <h3 class="ablation-panel-title">(a) Iterative refinement</h3>
+                    <div class="ablation-grid" role="group" aria-label="Iterative refinement ablation">
+                        <span class="ablation-row-label">w/o refinement</span>
+                        <img src="assets/ablations/iters/baseline/01.png" alt="Without iterative refinement, example 1" loading="lazy">
+                        <img src="assets/ablations/iters/baseline/02.png" alt="Without iterative refinement, example 2" loading="lazy">
+                        <img src="assets/ablations/iters/baseline/03.png" alt="Without iterative refinement, example 3" loading="lazy">
+                        <span class="ablation-row-label">w/ refinement</span>
+                        <img src="assets/ablations/iters/ours/01.png" alt="With iterative refinement, example 1" loading="lazy">
+                        <img src="assets/ablations/iters/ours/02.png" alt="With iterative refinement, example 2" loading="lazy">
+                        <img src="assets/ablations/iters/ours/03.png" alt="With iterative refinement, example 3" loading="lazy">
+                    </div>
+                </div>
+
+                <div class="ablation-panel">
+                    <h3 class="ablation-panel-title">(b) WAFT</h3>
+                    <div class="ablation-grid" role="group" aria-label="WAFT ablation">
+                        <span class="ablation-row-label">w/o WAFT</span>
+                        <img src="assets/ablations/waft/baseline/01.png" alt="Without WAFT, example 1" loading="lazy">
+                        <img src="assets/ablations/waft/baseline/02.png" alt="Without WAFT, example 2" loading="lazy">
+                        <img src="assets/ablations/waft/baseline/03.png" alt="Without WAFT, example 3" loading="lazy">
+                        <span class="ablation-row-label">w/ WAFT</span>
+                        <img src="assets/ablations/waft/ours/01.png" alt="With WAFT, example 1" loading="lazy">
+                        <img src="assets/ablations/waft/ours/02.png" alt="With WAFT, example 2" loading="lazy">
+                        <img src="assets/ablations/waft/ours/03.png" alt="With WAFT, example 3" loading="lazy">
+                    </div>
+                </div>
             </div>
         </div>
     </section>
