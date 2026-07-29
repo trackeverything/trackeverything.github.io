@@ -526,6 +526,34 @@ figcaption,
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+/* Ours-vs-baselines table: one row per sequence, ours in the rightmost column. */
+.compare-grid {
+    grid-template-columns: 6.5rem repeat(2, minmax(0, 1fr));
+    gap: 0.8rem 1.1rem;
+    align-items: center;
+}
+
+.compare-col-label {
+    text-align: center;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+}
+
+.compare-col-label.is-ours {
+    color: var(--accent);
+}
+
+.compare-row-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--text-soft);
+    text-align: right;
+}
+
 .clip {
     margin: 0;
 }
@@ -1004,6 +1032,10 @@ table.results tbody tr:last-child td {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
+    .compare-grid {
+        grid-template-columns: 5rem repeat(2, minmax(0, 1fr));
+    }
+
     .clip-rail {
         --per-view: 2;
     }
@@ -1036,6 +1068,11 @@ table.results tbody tr:last-child td {
 
     .clip-grid {
         grid-template-columns: 1fr;
+    }
+
+    .compare-grid {
+        grid-template-columns: 3.9rem repeat(2, minmax(0, 1fr));
+        gap: 0.5rem 0.5rem;
     }
 
     .plot-grid {

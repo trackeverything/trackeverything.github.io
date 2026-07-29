@@ -639,24 +639,69 @@
             <h2>Comparison with Baselines</h2>
             <p class="section-intro">
                 Qualitative comparison against prior trackers on the same sequences.
-                Drag or scroll the strip to see the rest; click any clip to enlarge.
+                Each row is one sequence; click any clip to enlarge.
             </p>
 
-            <div class="clip-carousel" data-carousel>
-                <div class="rail-shell">
-                    <button type="button" class="rail-nav rail-nav-prev" data-rail-prev
-                            aria-label="Previous clips">&lsaquo;</button>
-                    <div class="clip-rail clip-rail-2row" data-rail tabindex="0" role="group"
-                         aria-label="Baseline comparison clips (scroll horizontally)">
-                        <!-- Add clips under assets/comparisons/ -->
+            <div class="clip-grid compare-grid" role="group" aria-label="Baseline versus ours comparisons">
+                <span class="compare-corner"></span>
+                <h3 class="compare-col-label">Baseline 1: DELTA-v2</h3>
+                <h3 class="compare-col-label is-ours">Ours</h3>
+
+                <span class="compare-row-label">DAVIS<br>breakdance</span>
+                <figure class="clip">
+                    <div class="clip-media">
+                        <video data-src="assets/wandb_baselines/deltav2/deltav2_davis_breakdance.mp4"
+                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
                     </div>
-                    <button type="button" class="rail-nav rail-nav-next" data-rail-next
-                            aria-label="Next clips">&rsaquo;</button>
-                </div>
-                <div class="rail-footer">
-                    <div class="rail-dots" data-rail-dots role="tablist" aria-label="Clip pages"></div>
-                    <p class="rail-count" data-rail-count aria-live="polite"></p>
-                </div>
+                </figure>
+                <figure class="clip">
+                    <div class="clip-media">
+                        <video data-src="assets/wandb_ours/ours_breakdance.mp4"
+                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                    </div>
+                </figure>
+
+                <span class="compare-row-label">DAVIS<br>dance-jump</span>
+                <figure class="clip">
+                    <div class="clip-media">
+                        <video data-src="assets/wandb_baselines/deltav2/deltav2_davis_dance_jump.mp4"
+                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                    </div>
+                </figure>
+                <figure class="clip">
+                    <div class="clip-media">
+                        <video data-src="assets/wandb_ours/ours_dance_jump.mp4"
+                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                    </div>
+                </figure>
+
+                <span class="compare-row-label">MeViS<br>963a498a493b</span>
+                <figure class="clip">
+                    <div class="clip-media">
+                        <video data-src="assets/wandb_baselines/deltav2/deltav2_mevis_963a498a493b.mp4"
+                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                    </div>
+                </figure>
+                <figure class="clip">
+                    <div class="clip-media">
+                        <video data-src="assets/wandb_ours/ours_963a498a493b.mp4"
+                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                    </div>
+                </figure>
+
+                <span class="compare-row-label">MeViS<br>d32e4f23eb40</span>
+                <figure class="clip">
+                    <div class="clip-media">
+                        <video data-src="assets/wandb_baselines/deltav2/deltav2_mevis_d32e4f23eb40.mp4"
+                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                    </div>
+                </figure>
+                <figure class="clip">
+                    <div class="clip-media">
+                        <video data-src="assets/wandb_ours/ours_d32e4f23eb40.mp4"
+                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                    </div>
+                </figure>
             </div>
         </div>
     </section>
