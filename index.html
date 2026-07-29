@@ -322,35 +322,67 @@
             <h2>Long Video Evaluation</h2>
             <p class="section-intro">
                 Dense tracks on full-length sequences (1000+ frames).
-                Click any clip to enlarge; the Uptown Funk clip plays with audio.
+                Click any clip to enlarge. We recommend clicking the dance videos to enjoy tracking with music.
+                Drag or scroll the strip to see more.
             </p>
 
-            <div class="clip-grid">
-                <figure class="clip">
-                    <div class="clip-media is-wide">
-                        <video data-src="assets/long_video/pod_1.mp4"
-                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+            <div class="clip-carousel" data-carousel>
+                <div class="rail-shell">
+                    <button type="button" class="rail-nav rail-nav-prev" data-rail-prev
+                            aria-label="Previous clips">&lsaquo;</button>
+                    <div class="clip-rail clip-rail-3row clip-rail-long" data-rail tabindex="0" role="group"
+                         aria-label="Long video result clips (scroll horizontally)">
+                        <!-- Column-major: 2 cols × 3 rows = 6 on the first page. -->
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/long_video/uptown_1.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"
+                                       data-has-audio></video>
+                            </div>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/long_video/uptown_4.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"
+                                       data-has-audio></video>
+                            </div>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/long_video/pod_1.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/long_video/uptown_3.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"
+                                       data-has-audio></video>
+                            </div>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/long_video/uptown_5.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"
+                                       data-has-audio></video>
+                            </div>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/long_video/pod_2.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/long_video/pod_3.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                        </figure>
                     </div>
-                </figure>
-                <figure class="clip">
-                    <div class="clip-media is-wide">
-                        <video data-src="assets/long_video/pod_2.mp4"
-                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
-                    </div>
-                </figure>
-                <figure class="clip">
-                    <div class="clip-media is-wide">
-                        <video data-src="assets/long_video/pod_3.mp4"
-                               muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
-                    </div>
-                </figure>
-                <figure class="clip">
-                    <div class="clip-media is-wide">
-                        <video data-src="assets/long_video/uptown_1.mp4"
-                               muted loop playsinline preload="none" data-autoplay data-unload="true"
-                               data-has-audio></video>
-                    </div>
-                </figure>
+                    <button type="button" class="rail-nav rail-nav-next" data-rail-next
+                            aria-label="Next clips">&rsaquo;</button>
+                </div>
             </div>
         </div>
     </section>

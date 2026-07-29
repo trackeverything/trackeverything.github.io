@@ -681,6 +681,15 @@ figcaption,
     --rail-rows: 2;
 }
 
+.clip-rail-3row {
+    --rail-rows: 3;
+}
+
+/* Long-video strip: 2 columns × 3 rows = 6 clips on the first page. */
+.clip-rail-long {
+    --per-view: 2;
+}
+
 .clip-rail > .clip {
     scroll-snap-align: start;
 }
