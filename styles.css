@@ -226,6 +226,12 @@ strong {
     flex-wrap: wrap;
 }
 
+.equal-contrib {
+    margin-top: 0.35rem;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+}
+
 .affiliations sup {
     font-size: 0.7em;
     padding-right: 2px;
