@@ -40,7 +40,9 @@ const applyPlaybackRate = (video) => {
   const isQual =
     src.includes("/good_cases/") ||
     src.includes("/failure_cases/") ||
-    src.includes("/static_dynamic/");
+    src.includes("/static_dynamic/") ||
+    src.includes("/wandb_baselines/") ||
+    src.includes("/wandb_ours/");
   if (!isQual) {
     video.playbackRate = 1;
     return;
