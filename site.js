@@ -406,7 +406,7 @@ const setupLightbox = () => {
     if (!figure || !sourceOf(figure)) return;
 
     /* Siblings of the clicked clip become the lightbox's playlist. */
-    const container = figure.closest("[data-rail]") || figure.closest(".clip-grid");
+    const container = figure.closest(".som-page") || figure.closest("[data-rail]") || figure.closest(".clip-grid");
     group = container ? [...container.querySelectorAll(".clip")] : [figure];
     const start = Math.max(0, group.indexOf(figure));
 

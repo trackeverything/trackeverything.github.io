@@ -417,10 +417,10 @@ def teaser_edit() -> list:
         Seg(f"{R}/baseball.mp4", 1.2, 4.0, cues=[
             head_cue("every point, every frame", 0.5, 3.6),
         ]),
-        Seg(f"{R}/pandas_great.mp4", 2.4, 4.2),
+        Seg(f"{R}/pandas_1.mp4", 2.4, 4.2),
 
         # --- range of scenes ------------------------------------------------
-        Seg(f"{R}/ours_a2de8ecf0da5.mp4", 1.2, 3.6),
+        Seg(f"{R}/tigers.mp4", 1.2, 3.6),
         Seg(f"{R}/ours-breakdance.mp4", 1.8, 3.6),
         Seg(f"{R}/ours_horsejump-high_30fps.mp4", 0.0, 2.2),
         Seg(f"{R}/ours_tennis.mp4", 0.2, 3.4, cues=[
@@ -430,7 +430,7 @@ def teaser_edit() -> list:
         ]),
         Seg(f"{R}/basketball.mp4", 1.0, 3.4),
         Seg(f"{R}/ours_swing.mp4", 0.2, 3.2),
-        Seg(f"{R}/ours_963a498a493b.mp4", 0.2, 3.2),
+        Seg(f"{R}/cars.mp4", 0.2, 3.2),
 
         # --- long video -----------------------------------------------------
         Seg(f"{L}/uptown_1.mp4", 3.0, 7.0, speed=4.5, blur=4, cues=[
@@ -472,8 +472,8 @@ def hero_edit() -> list:
     return [
         Seg(f"{R}/tennis.mp4", 0.0, 3.8),
         Seg(f"{R}/baseball.mp4", 1.2, 3.6),
-        Seg(f"{R}/pandas_great.mp4", 2.4, 3.6),
-        Seg(f"{R}/ours_a2de8ecf0da5.mp4", 1.2, 3.4),
+        Seg(f"{R}/pandas_1.mp4", 2.4, 3.6),
+        Seg(f"{R}/tigers.mp4", 1.2, 3.4),
         Seg(f"{R}/ours-breakdance.mp4", 1.8, 3.6),
         Seg(f"{L}/uptown_1.mp4", 3.0, 4.2, speed=4.5, blur=4),
         Seg(f"{R}/basketball.mp4", 1.0, 3.4),

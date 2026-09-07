@@ -571,8 +571,12 @@ figcaption,
     aspect-ratio: 8 / 3;
 }
 
+.hero .clip-media {
+    background: #fff;
+}
+
 .clip-media.is-wide video {
-    object-fit: contain;
+    object-fit: cover;
 }
 
 .clip-media video {

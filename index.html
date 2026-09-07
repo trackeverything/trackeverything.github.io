@@ -12,8 +12,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles_som_try.css">
 </head>
-<body>
+<!-- Revert the More Results experiment: change som → carousel on the next line. -->
+<body data-hero-layout="som">
 
     <!-- ================================ Hero ================================ -->
     <header class="hero">
@@ -65,14 +67,74 @@
             </div>
         </div>
 
-        <div class="container container-wide">
+        <div class="container container-wide hero-layout-carousel">
             <div class="clip-carousel" data-carousel>
                 <div class="rail-shell">
                     <button type="button" class="rail-nav rail-nav-prev" data-rail-prev
                             aria-label="Previous clips">&lsaquo;</button>
                     <div class="clip-rail clip-rail-2row" data-rail tabindex="0" role="group"
                          aria-label="Rerun 3D tracking results (scroll horizontally)">
-                        <!-- Column-major order so the first page matches the old 2x2 hero grid. -->
+                        <!-- Column-major: newer white-bg 3D pairs first, older DAVIS/sports later. -->
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/rerun_ours/pandas_1.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/rerun_ours/tigers.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/rerun_ours/goats.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/rerun_ours/cats.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/rerun_ours/cow_1.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/rerun_ours/fish.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/rerun_ours/cars.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/rerun_ours/circus.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/rerun_ours/hands.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-wide">
+                                <video data-src="assets/rerun_ours/goat_human.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                        </figure>
                         <figure class="clip">
                             <div class="clip-media is-wide">
                                 <video data-src="assets/rerun_ours/basketball.mp4"
@@ -88,12 +150,6 @@
                         <figure class="clip">
                             <div class="clip-media is-wide">
                                 <video data-src="assets/rerun_ours/baseball.mp4"
-                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
-                            </div>
-                        </figure>
-                        <figure class="clip">
-                            <div class="clip-media is-wide">
-                                <video data-src="assets/rerun_ours/pandas_great.mp4"
                                        muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
                             </div>
                         </figure>
@@ -127,42 +183,6 @@
                                        muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
                             </div>
                         </figure>
-                        <figure class="clip">
-                            <div class="clip-media is-wide">
-                                <video data-src="assets/rerun_ours/ours_2fbec459efc2.mp4"
-                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
-                            </div>
-                        </figure>
-                        <figure class="clip">
-                            <div class="clip-media is-wide">
-                                <video data-src="assets/rerun_ours/ours_7fd5537074bd.mp4"
-                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
-                            </div>
-                        </figure>
-                        <figure class="clip">
-                            <div class="clip-media is-wide">
-                                <video data-src="assets/rerun_ours/ours_963a498a493b.mp4"
-                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
-                            </div>
-                        </figure>
-                        <figure class="clip">
-                            <div class="clip-media is-wide">
-                                <video data-src="assets/rerun_ours/ours_a2de8ecf0da5.mp4"
-                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
-                            </div>
-                        </figure>
-                        <figure class="clip">
-                            <div class="clip-media is-wide">
-                                <video data-src="assets/rerun_ours/ours_b4d6cf8c922c.mp4"
-                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
-                            </div>
-                        </figure>
-                        <figure class="clip">
-                            <div class="clip-media is-wide">
-                                <video data-src="assets/rerun_ours/ours_mevis_tbd.mp4"
-                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
-                            </div>
-                        </figure>
                     </div>
                     <button type="button" class="rail-nav rail-nav-next" data-rail-next
                             aria-label="Next clips">&rsaquo;</button>
@@ -170,6 +190,336 @@
 
                 <div class="rail-footer">
                     <div class="rail-dots" data-rail-dots role="tablist" aria-label="Clip pages"></div>
+                    <p class="rail-count" data-rail-count aria-live="polite"></p>
+                </div>
+            </div>
+        </div>
+        <div class="container container-wide hero-layout-som">
+            <p class="section-intro som-intro">
+                Each row is one sequence: input video, 3D tracks, and 2D tracks.
+                Scroll sideways for more; click any clip to enlarge.
+            </p>
+            <div class="som-col-heads" aria-hidden="true">
+                <span>Input Video</span>
+                <span>3D Tracks</span>
+                <span>2D Tracks</span>
+            </div>
+            <div class="clip-carousel" data-carousel>
+                <div class="rail-shell">
+                    <button type="button" class="rail-nav rail-nav-prev" data-rail-prev
+                            aria-label="Previous results">&lsaquo;</button>
+                    <div class="clip-rail som-rail" data-rail tabindex="0" role="group"
+                         aria-label="Input, 3D, and 2D tracking results (scroll horizontally)">
+                    <div class="som-page">
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/pandas_1_input.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">Input video</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-som-3d">
+                                <video data-src="assets/som_try/pandas_1_3d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">3D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/pandas_1_2d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">2D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/tigers_input.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">Input video</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-som-3d">
+                                <video data-src="assets/som_try/tigers_3d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">3D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/tigers_2d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">2D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/goats_input.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">Input video</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-som-3d">
+                                <video data-src="assets/som_try/goats_3d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">3D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/goats_2d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">2D tracks</figcaption>
+                        </figure>
+                    </div>
+                    <div class="som-page">
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/cats_input.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">Input video</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-som-3d">
+                                <video data-src="assets/som_try/cats_3d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">3D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/cats_2d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">2D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/cow_1_input.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">Input video</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-som-3d">
+                                <video data-src="assets/som_try/cow_1_3d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">3D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/cow_1_2d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">2D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/fish_input.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">Input video</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-som-3d">
+                                <video data-src="assets/som_try/fish_3d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">3D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/fish_2d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">2D tracks</figcaption>
+                        </figure>
+                    </div>
+                    <div class="som-page">
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/cars_input.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">Input video</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-som-3d">
+                                <video data-src="assets/som_try/cars_3d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">3D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/cars_2d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">2D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/hands_input.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">Input video</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-som-3d">
+                                <video data-src="assets/som_try/hands_3d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">3D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/hands_2d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">2D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/goat_human_input.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">Input video</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-som-3d">
+                                <video data-src="assets/som_try/goat_human_3d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">3D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/goat_human_2d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">2D tracks</figcaption>
+                        </figure>
+                    </div>
+                    <div class="som-page">
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/breakdance_input.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">Input video</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-som-3d">
+                                <video data-src="assets/som_try/breakdance_3d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">3D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/breakdance_2d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">2D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/dance-jump_input.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">Input video</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-som-3d">
+                                <video data-src="assets/som_try/dance-jump_3d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">3D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/dance-jump_2d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">2D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/horsejump-high_input.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">Input video</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-som-3d">
+                                <video data-src="assets/som_try/horsejump-high_3d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">3D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/horsejump-high_2d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">2D tracks</figcaption>
+                        </figure>
+                    </div>
+                    <div class="som-page">
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/swing_input.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">Input video</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-som-3d">
+                                <video data-src="assets/som_try/swing_3d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">3D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/swing_2d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">2D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/tennis_input.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">Input video</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media is-som-3d">
+                                <video data-src="assets/som_try/tennis_3d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">3D tracks</figcaption>
+                        </figure>
+                        <figure class="clip">
+                            <div class="clip-media">
+                                <video data-src="assets/som_try/tennis_2d.mp4"
+                                       muted loop playsinline preload="none" data-autoplay data-unload="true"></video>
+                            </div>
+                            <figcaption class="visually-hidden">2D tracks</figcaption>
+                        </figure>
+                    </div>
+                    </div>
+                    <button type="button" class="rail-nav rail-nav-next" data-rail-next
+                            aria-label="Next results">&rsaquo;</button>
+                </div>
+                <div class="rail-footer">
+                    <div class="rail-dots" data-rail-dots role="tablist" aria-label="Result pages"></div>
                     <p class="rail-count" data-rail-count aria-live="polite"></p>
                 </div>
             </div>
