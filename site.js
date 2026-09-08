@@ -447,7 +447,51 @@ const setupLightbox = () => {
   });
 };
 
+/* Keep Input / 3D / 2D in each SOM row on the same clock. The three
+   files share duration and fps; browsers still drift on looped autoplay. */
+const setupSomSync = () => {
+  document.querySelectorAll(".som-page").forEach((page) => {
+    const videos = [...page.querySelectorAll("video")];
+    for (let i = 0; i < videos.length; i += 3) {
+      const trio = videos.slice(i, i + 3);
+      if (trio.length < 3) continue;
+
+      let locking = false;
+      const align = (lead) => {
+        if (locking) return;
+        locking = true;
+        const t = lead.currentTime;
+        trio.forEach((video) => {
+          if (video === lead) return;
+          if (Number.isFinite(video.duration) && Math.abs(video.currentTime - t) > 0.08) {
+            video.currentTime = t;
+          }
+        });
+        locking = false;
+      };
+
+      trio.forEach((video) => {
+        video.addEventListener("play", () => {
+          trio.forEach((other) => {
+            if (other.paused) other.play().catch(() => {});
+          });
+          align(video);
+        });
+        video.addEventListener("pause", () => {
+          if (locking) return;
+          trio.forEach((other) => {
+            if (!other.paused) other.pause();
+          });
+        });
+        video.addEventListener("seeked", () => align(video));
+        video.addEventListener("timeupdate", () => align(video));
+      });
+    }
+  });
+};
+
 setupSequenceViewer();
 setupVideoPlayback();
 setupClipRails();
+setupSomSync();
 setupLightbox();
