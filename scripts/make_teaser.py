@@ -454,15 +454,10 @@ def teaser_edit() -> list:
                 y=506, size=36, color=WHITE, bold=False),
             Cue("via 3D Scene Representations", 0.5, 5.0,
                 y=552, size=36, color=WHITE, bold=False),
-            Cue("Ayush Jain · Sreeharsha Paruchuri · Ishita Gupta · Fan Zhang",
+            Cue("Anonymous Authors",
                 0.9, 5.0, y=640, size=25, color=MUTED, bold=False),
-            Cue("Tanner Schmidt · Jakob Engel · Katerina Fragkiadaki · "
-                "Adam W. Harley",
-                0.9, 5.0, y=676, size=25, color=MUTED, bold=False),
-            Cue("Carnegie Mellon University   ·   Meta", 1.1, 5.0,
+            Cue("Paper under double-blind review", 1.1, 5.0,
                 y=726, size=25, color=MUTED, bold=False),
-            Cue("trackeverything.github.io", 1.4, 5.0,
-                y=778, size=32, color=ACCENT, bold=False),
         ]),
     ]
 
