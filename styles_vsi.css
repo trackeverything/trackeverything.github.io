@@ -335,6 +335,13 @@ h1.paper-title {
   white-space: nowrap;
 }
 
+.coming-soon {
+  margin-top: 0.75rem;
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
 .button {
   display: inline-flex;
   align-items: center;
