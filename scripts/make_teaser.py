@@ -1101,11 +1101,11 @@ def twitter_edit():
         Pair(f"{S}/pandas_1_3d.mp4", f"{S}/pandas_1_2d.mp4",
              ss=0.4, dur=6.8, speed=0.5),
         Pair(f"{S}/tigers_3d.mp4", f"{S}/tigers_2d.mp4", ss=0.12, dur=2.55),
-        Pair(f"{S}/hands_3d.mp4", f"{S}/hands_2d.mp4", ss=0.6, dur=5.8, speed=0.5),
-        Pair(f"{S}/breakdance_3d.mp4", f"{S}/breakdance_2d.mp4", ss=1.6, dur=3.20),
-        Pair(f"{S}/tennis_3d.mp4", f"{S}/tennis_2d.mp4", ss=0.5, dur=2.80),
         # Play through to the end of the clip. A short dur was cutting it off.
         Pair(f"{S}/robot_1_3d.mp4", f"{S}/robot_1_2d.mp4", ss=1.0, dur=30.0),
+        Pair(f"{S}/breakdance_3d.mp4", f"{S}/breakdance_2d.mp4", ss=1.6, dur=3.20),
+        Pair(f"{S}/tennis_3d.mp4", f"{S}/tennis_2d.mp4", ss=0.5, dur=2.80),
+        Pair(f"{S}/hands_3d.mp4", f"{S}/hands_2d.mp4", ss=0.6, dur=5.8, speed=0.5),
         Full(f"{L}/uptown_6.mp4", ss=2.0, dur=6.5, speed=1.5, caption=True),
         EndCard(3.8),
     ]
