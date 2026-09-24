@@ -1,27 +1,35 @@
 #!/usr/bin/env python3
 """Build the TrackEverything teaser videos from the clips already in assets/.
 
-Three cuts come out of the same edit list:
-
   hero          assets/teaser/hero_loop.mp4     30s, 1440x540, silent, no text,
                                                 seamlessly looping. For the top of
                                                 the website.
   teaser-plain  assets/teaser/teaser_plain.mp4  54s, 1920x1080, silent, no text.
   teaser-text   assets/teaser/teaser_text.mp4   59s, 1920x1080, silent, with a
                                                 title, beat captions and an end card.
+  twitter       assets/teaser/twitter.mp4       ~35s, 1920x1080, silent. A mostly
+                                                visual cut for a tweet: 3D | 2D
+                                                diptychs, then a long-video finale
+                                                and a short end card.
 
-The source clips render on a black background, so every cut composites onto a
-black canvas: the letterboxing is invisible and the content appears to float.
+Newer renders sit on white; older ones sit on black, sometimes letterboxed
+inside a white frame. The twitter cut detects that per clip and extends the
+matching background, so the plate doesn't show up as a stripe.
+
+The hero and the long teasers composite onto black and draw captions with
+ffmpeg's drawtext filter (needs a build with libfreetype). The twitter cut
+draws type with Pillow instead, so it builds on the stock Homebrew ffmpeg.
 
 Usage:
-  scripts/make_teaser.py                      # build everything
-  scripts/make_teaser.py hero teaser-text     # build a subset
-  scripts/make_teaser.py --fast               # draft quality, much quicker
+  scripts/make_teaser.py twitter              # the tweet
+  scripts/make_teaser.py twitter --fast       # draft quality, much quicker
+  scripts/make_teaser.py                      # hero + both long teasers
 """
 
 from __future__ import annotations
 
 import argparse
+import io
 import os
 import shlex
 import shutil
@@ -123,9 +131,68 @@ class Card:
     cues: list[Cue] = field(default_factory=list)
 
 
+@dataclass
+class Pair:
+    """3D tracks on the left, 2D tracks on the right, filling a 16:9 frame.
+
+    The left plate is contained and padded with the clip's own background
+    (white or black). The right plate is contained too, so the 2D view is
+    not cropped; the spare band uses the same background as the 3D plate.
+    """
+    left: str
+    right: str
+    ss: float = 0.0
+    dur: float = 3.0
+    speed: float = 1.0          # <1 slows the shot down
+    title: bool = False
+
+
+@dataclass
+class Collage:
+    """A grid of tracked views playing at once.
+
+    These are the 2D track renders, which already fill the frame. The 3D
+    plates are left out: newer ones are white and older ones are black, and a
+    grid of both would show as stripes. Each tile is contained, not cropped.
+    `speeds` matches the site: 0.5× for the in-the-wild clips that were
+    encoded fast (pandas, hands), 1× for the other som clips, 2× DAVIS,
+    4× MeViS.
+    """
+    srcs: list[str]
+    starts: list[float]
+    cols: int
+    rows: int
+    dur: float
+    speeds: list[float] = field(default_factory=list)
+    title: bool = False
+
+
+@dataclass
+class Full:
+    """One clip filling the frame. Cover-crop by default; contain keeps every pixel."""
+    src: str
+    ss: float = 0.0
+    dur: float = 4.0
+    speed: float = 1.0
+    caption: bool = False
+    contain: bool = False
+
+
+@dataclass
+class EndCard:
+    """White closing card: name, line, URL."""
+    dur: float = 3.8
+
+
 # --------------------------------------------------------------------------- #
 # ffmpeg helpers
 # --------------------------------------------------------------------------- #
+
+def ffmpeg_has_filter(name: str) -> bool:
+    out = subprocess.run(["ffmpeg", "-hide_banner", "-filters"],
+                         capture_output=True, text=True).stdout
+    return f" {name} " in out
+
 
 def run(cmd: list[str], verbose: bool) -> None:
     if verbose:
@@ -380,6 +447,512 @@ def fold_loop(src: str, fold: float, out: str, crf: int, preset: str,
 
 
 # --------------------------------------------------------------------------- #
+# twitter cut — plates, type, diptychs
+# --------------------------------------------------------------------------- #
+
+# Site palette, so the end card matches the paper page.
+INK = (20, 24, 29)          # --text
+SOFT = (67, 80, 95)         # --text-soft
+MUTED_RGB = (96, 108, 122)
+ACCENT_RGB = (28, 78, 128)  # --accent
+
+XFADE_TW = 0.32
+
+
+def _libs():
+    try:
+        import numpy as np
+        from PIL import Image, ImageDraw, ImageFont, ImageFilter
+    except ImportError:
+        print("error: the twitter cut needs Pillow and numpy\n"
+              "       pip install pillow numpy", file=sys.stderr)
+        raise SystemExit(1)
+    return np, Image, ImageDraw, ImageFont, ImageFilter
+
+
+def _font_file(candidates):
+    for path in candidates:
+        if os.path.exists(path):
+            return path
+    return None
+
+
+def load_fonts():
+    """Serif italic for the name (the site sets it in italic), sans for the rest."""
+    _, _, _, ImageFont, _ = _libs()
+    serif = _font_file([
+        "/System/Library/Fonts/Supplemental/Iowan Old Style.ttc",
+        "/usr/share/fonts/truetype/liberation/LiberationSerif-BoldItalic.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSerif-Italic.ttf",
+    ])
+    sans = _font_file([
+        "/System/Library/Fonts/HelveticaNeue.ttc",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+    ])
+    sans_bold = _font_file([
+        "/System/Library/Fonts/HelveticaNeue.ttc",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+    ])
+    if not serif or not sans:
+        print("error: could not find a serif and a sans font for the twitter cut",
+              file=sys.stderr)
+        raise SystemExit(1)
+
+    def face(path, size, index):
+        if path.endswith(".ttc"):
+            return ImageFont.truetype(path, size, index=index)
+        return ImageFont.truetype(path, size)
+
+    # Iowan Old Style face 3 is Bold Italic. Helvetica Neue: 1 bold, 10 medium.
+    # Single-face files (Liberation) ignore the index.
+    class Faces:
+        pass
+
+    faces = Faces()
+    faces.serif_path = serif
+    faces.serif_index = 3 if serif.endswith(".ttc") else 0
+    faces.sans_path = sans
+    faces.bold_path = sans_bold or sans
+    faces.idx_bold = 1 if faces.bold_path.endswith(".ttc") else 0
+    faces.idx_med = 10 if sans.endswith(".ttc") else 0
+    faces.idx_reg = 0
+    faces.face = face
+    return faces
+
+
+def read_frame(path, t):
+    _, Image, _, _, _ = _libs()
+    raw = subprocess.run(
+        ["ffmpeg", "-v", "error", "-ss", f"{t:.3f}", "-i", path,
+         "-frames:v", "1", "-f", "image2pipe", "-vcodec", "png", "-"],
+        capture_output=True, check=True).stdout
+    return Image.open(io.BytesIO(raw)).convert("RGB")
+
+
+def _dilate(mask, radius):
+    """Binary dilation that does not wrap around the frame edges."""
+    np, *_ = _libs()
+    if radius <= 0:
+        return mask
+    h, w = mask.shape
+    padded = np.pad(mask, radius, constant_values=False)
+    out = np.zeros_like(mask)
+    r2 = radius * radius
+    for dy in range(-radius, radius + 1):
+        for dx in range(-radius, radius + 1):
+            if dx * dx + dy * dy > r2:
+                continue
+            out |= padded[dy + radius:dy + radius + h, dx + radius:dx + radius + w]
+    return out
+
+
+def plate_crop(path, ss, dur):
+    """How to seat a 3D render on the left half of the frame.
+
+    Newer clips are a point cloud on a white field: pad with white and the
+    field just continues. Older clips are a black render dropped onto a white
+    matte (white bars around a black window). Those get the matte cropped off
+    and the empty black bars trimmed, then pad with black so the window
+    continues instead of leaving a white stripe.
+
+    The crop is the union across the shot, so an orbiting cloud is not clipped
+    by a box measured on a single frame.
+    """
+    np, *_ = _libs()
+    src_dur = probe_duration(path)
+    times = []
+    for u in (0.08, 0.30, 0.55, 0.78, 0.94):
+        t = ss + dur * u
+        if 0.05 < t < src_dur - 0.05:
+            times.append(t)
+    if not times:
+        times = [min(ss + 0.1, max(0.0, src_dur - 0.1))]
+
+    frames = [np.asarray(read_frame(path, t)) for t in times]
+    h, w = frames[0].shape[:2]
+
+    def white_of(a):
+        return (a[:, :, 0] >= 232) & (a[:, :, 1] >= 232) & (a[:, :, 2] >= 232)
+
+    boxes = []
+    for a in frames:
+        fg = ~_dilate(white_of(a), 3)
+        ys, xs = np.where(fg)
+        if len(xs) == 0:
+            continue
+        boxes.append((int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1))
+    if not boxes:
+        return "white", None
+
+    x0 = min(b[0] for b in boxes)
+    y0 = min(b[1] for b in boxes)
+    x1 = max(b[2] for b in boxes)
+    y1 = max(b[3] for b in boxes)
+    # The corner of a bounding box is often still background: the extreme
+    # pixels sit mid-edge, not in the corner. A black render is a rectangle,
+    # so those corners are black. A white-field cloud is irregular, so the
+    # corners fall on white. That is the test.
+    inset = 8
+    mid = frames[len(frames) // 2]
+    sx0, sy0 = min(x0 + inset, w - 2), min(y0 + inset, h - 2)
+    sx1, sy1 = max(x1 - inset, sx0 + 1), max(y1 - inset, sy0 + 1)
+    sub = mid[sy0:sy1, sx0:sx1]
+    sh, sw = sub.shape[:2]
+    corners = [sub[2, 2], sub[2, -3], sub[-3, 2], sub[-3, -3]]
+    content_luma = float(np.median([p.mean() for p in corners]))
+    area = (x1 - x0) * (y1 - y0) / float(w * h)
+    if not (content_luma < 42 and area < 0.96):
+        samp = [frames[0][2, 2], frames[0][2, -3], frames[0][-3, 2], frames[0][-3, -3]]
+        edge_luma = float(np.median([p.mean() for p in samp]))
+        return ("white" if edge_luma > 180 else "black"), None
+
+    # Drop the anti-aliased white fringe, then trim rows and columns that are
+    # empty black (or a leftover white hairline) across every sampled frame.
+    x0, y0, x1, y1 = x0 + 4, y0 + 4, x1 - 4, y1 - 4
+    x0, y0 = max(0, x0), max(0, y0)
+    x1, y1 = min(w, x1), min(h, y1)
+
+    row_keep = np.zeros(y1 - y0, dtype=bool)
+    col_keep = np.zeros(x1 - x0, dtype=bool)
+    for a in frames:
+        window = a[y0:y1, x0:x1]
+        luma = window.mean(axis=2)
+        empty = (luma < 16) | (luma > 242)
+        row_keep |= empty.mean(axis=1) < 0.985
+        col_keep |= empty.mean(axis=0) < 0.985
+    if row_keep.any():
+        ys = np.where(row_keep)[0]
+        y0, y1 = y0 + int(ys[0]), y0 + int(ys[-1]) + 1
+    if col_keep.any():
+        xs = np.where(col_keep)[0]
+        x0, x1 = x0 + int(xs[0]), x0 + int(xs[-1]) + 1
+
+    # A little black margin so the cloud doesn't kiss the crop, then walk
+    # back in over any white fringe that margin (or antialiasing) reintroduced.
+    # A fringe only counts if it is bright in every sample, so a white shirt
+    # in one frame is left alone.
+    m = 8
+    x0, y0 = max(0, x0 - m), max(0, y0 - m)
+    x1, y1 = min(w, x1 + m), min(h, y1 + m)
+
+    def col_luma(a, x):
+        return float(np.median(a[y0:y1, x].mean(axis=1)))
+
+    def row_luma(a, y):
+        return float(np.median(a[y, x0:x1].mean(axis=1)))
+
+    for _ in range(48):
+        if x1 - x0 < 48 or y1 - y0 < 48:
+            break
+        moved = False
+        if all(col_luma(a, x0) > 170 for a in frames):
+            x0 += 1
+            moved = True
+        if x1 - x0 > 48 and all(col_luma(a, x1 - 1) > 170 for a in frames):
+            x1 -= 1
+            moved = True
+        if y1 - y0 > 48 and all(row_luma(a, y0) > 170 for a in frames):
+            y0 += 1
+            moved = True
+        if y1 - y0 > 48 and all(row_luma(a, y1 - 1) > 170 for a in frames):
+            y1 -= 1
+            moved = True
+        if not moved:
+            break
+    if x1 - x0 < 32 or y1 - y0 < 32:
+        return "black", None
+    return "black", (x0, y0, x1 - x0, y1 - y0)
+
+
+def _text_width(draw, text, font):
+    box = draw.textbbox((0, 0), text, font=font)
+    return box[2] - box[0], box
+
+
+def draw_centered(base, draw, text, font, y, fill, shadow=False):
+    _, Image, _, _, ImageFilter = _libs()
+    tw, box = _text_width(draw, text, font)
+    x = (base.width - tw) / 2 - box[0]
+    y = y - box[1]
+    if shadow:
+        layer = Image.new("RGBA", base.size, (0, 0, 0, 0))
+        ImageDraw = _libs()[2]
+        sd = ImageDraw.Draw(layer)
+        sd.text((x, y + 2), text, font=font, fill=(0, 0, 0, 150))
+        layer = layer.filter(ImageFilter.GaussianBlur(radius=5))
+        base.alpha_composite(layer)
+        draw = ImageDraw.Draw(base)
+    draw.text((x, y), text, font=font, fill=fill)
+    return draw
+
+
+def title_overlay(path, w, h, faces):
+    """Opening title, centered. A soft middle scrim keeps the type readable."""
+    np, Image, ImageDraw, _, _ = _libs()
+    im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    ys = np.arange(h)
+    alpha = (185 * np.exp(-0.5 * ((ys - h / 2) / 230) ** 2)).astype("uint8")
+    arr = np.zeros((h, w, 4), dtype="uint8")
+    arr[:, :, 3] = alpha[:, None]
+    im.alpha_composite(Image.fromarray(arr))
+    draw = ImageDraw.Draw(im)
+    serif = faces.face(faces.serif_path, 108, faces.serif_index)
+    for size in range(108, 78, -2):
+        serif = faces.face(faces.serif_path, size, faces.serif_index)
+        tw, _ = _text_width(draw, "TrackEverything", serif)
+        if tw <= w - 160:
+            break
+    line_a = "long-horizon dense 3D tracking"
+    line_b = "with de-duplicating 3D representations"
+    sub = faces.face(faces.sans_path, 36, faces.idx_med)
+    for size in range(40, 26, -1):
+        sub = faces.face(faces.sans_path, size, faces.idx_med)
+        wa, _ = _text_width(draw, line_a, sub)
+        wb, _ = _text_width(draw, line_b, sub)
+        if max(wa, wb) <= w - 140:
+            break
+    mid = h // 2
+    draw = draw_centered(im, draw, "TrackEverything", serif, mid - 90,
+                         (255, 255, 255, 255), shadow=True)
+    draw = draw_centered(im, draw, line_a, sub, mid + 30,
+                         (255, 255, 255, 240), shadow=True)
+    draw_centered(im, draw, line_b, sub, mid + 86,
+                  (255, 255, 255, 235), shadow=True)
+    im.save(path)
+
+
+def caption_overlay(path, w, h, faces):
+    """One line on the long-video shot. Bottom scrim, then it leaves."""
+    np, Image, ImageDraw, _, _ = _libs()
+    im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    grad_h = 280
+    alpha = (150 * np.linspace(0, 1, grad_h) ** 1.3).astype("uint8")
+    arr = np.zeros((h, w, 4), dtype="uint8")
+    arr[h - grad_h:, :, 3] = alpha[:, None]
+    im.alpha_composite(Image.fromarray(arr))
+    draw = ImageDraw.Draw(im)
+    bold = faces.face(faces.bold_path, 52, faces.idx_bold)
+    med = faces.face(faces.sans_path, 36, faces.idx_med)
+    draw = draw_centered(im, draw, "Tracking Everything in 1000–2000 Frames", bold,
+                         h - 188, (255, 255, 255, 255), shadow=True)
+    draw_centered(im, draw, "(under 40G memory)", med, h - 112,
+                  (255, 255, 255, 230), shadow=True)
+    im.save(path)
+
+
+def endcard_image(path, w, h, faces):
+    _, Image, ImageDraw, _, _ = _libs()
+    im = Image.new("RGB", (w, h), (255, 255, 255))
+    rgba = im.convert("RGBA")
+    draw = ImageDraw.Draw(rgba)
+    serif = faces.face(faces.serif_path, 118, faces.serif_index)
+    med = faces.face(faces.sans_path, 40, faces.idx_med)
+    url = faces.face(faces.bold_path, 48, faces.idx_bold)
+    reg = faces.face(faces.sans_path, 28, faces.idx_reg)
+    aff = faces.face(faces.sans_path, 30, faces.idx_med)
+    draw = draw_centered(rgba, draw, "TrackEverything", serif, 318, INK + (255,))
+    draw = draw_centered(rgba, draw, "Long-horizon dense 3D tracking", med, 468,
+                         SOFT + (255,))
+    draw.line([(w // 2 - 100, 548), (w // 2 + 100, 548)], fill=ACCENT_RGB + (255,), width=3)
+    draw_centered(rgba, draw, "Anonymous submission", url, 600,
+                  ACCENT_RGB + (255,))
+    rgba.convert("RGB").save(path)
+
+
+def _overlay_chain(base, specs):
+    """Fade each full-frame RGBA input in and out over `base`.
+
+    specs: list of (input_index, t0, t1, fade). Times are on the segment clock.
+    """
+    parts = []
+    prev = base
+    for n, (idx, t0, t1, fade) in enumerate(specs):
+        label = f"[ov{n}]"
+        out = f"[o{n}]"
+        fades = []
+        if t0 > 0.02:
+            fades.append(f"fade=t=in:st={t0:.3f}:d={fade:.3f}:alpha=1")
+        fades.append(
+            f"fade=t=out:st={max(t0 + fade, t1 - fade):.3f}:d={fade:.3f}:alpha=1")
+        parts.append(f"[{idx}:v]format=rgba,{','.join(fades)}{label}")
+        parts.append(f"{prev}{label}overlay=0:0:format=auto{out}")
+        prev = out
+    return parts, prev
+
+
+def render_pair(pair, w, h, out, with_text, tmp, faces, crf, preset, verbose):
+    left = os.path.join(ROOT, pair.left)
+    right = os.path.join(ROOT, pair.right)
+    avail = (min(probe_duration(left), probe_duration(right)) - pair.ss) / pair.speed
+    dur = min(pair.dur, avail - 0.04)
+    if dur < 0.4:
+        raise RuntimeError(f"{pair.left} is too short from {pair.ss}")
+    if dur < pair.dur - 0.05:
+        print(f"    note: {os.path.basename(pair.left)} clamped "
+              f"{pair.dur:.2f}s -> {dur:.2f}s")
+
+    pad, crop = plate_crop(left, pair.ss, dur)
+    pw, ph = w // 2, h
+    crop_f = ""
+    if crop:
+        x, y, cw, ch = crop
+        crop_f = f"crop={cw}:{ch}:{x}:{y},"
+        print(f"        plate {pad}  crop {cw}x{ch}+{x}+{y}")
+    else:
+        print(f"        plate {pad}")
+
+    rate = f"setpts=PTS/{pair.speed}," if pair.speed != 1.0 else ""
+    chain = [
+        f"[0:v]{rate}fps={FPS},setpts=PTS-STARTPTS,{crop_f}"
+        f"scale={pw}:{ph}:force_original_aspect_ratio=decrease:flags=lanczos,"
+        f"pad={pw}:{ph}:(ow-iw)/2:(oh-ih)/2:color={pad},setsar=1,format=yuv420p[l]",
+        f"[1:v]{rate}fps={FPS},setpts=PTS-STARTPTS,"
+        f"scale={pw}:{ph}:force_original_aspect_ratio=decrease:flags=lanczos,"
+        f"pad={pw}:{ph}:(ow-iw)/2:(oh-ih)/2:color={pad},setsar=1,format=yuv420p[r]",
+        "[l][r]hstack=inputs=2[base]",
+    ]
+    src_t = dur * pair.speed
+    inputs = ["-ss", f"{pair.ss:.3f}", "-t", f"{src_t:.3f}", "-i", left,
+              "-ss", f"{pair.ss:.3f}", "-t", f"{src_t:.3f}", "-i", right]
+    last = "[base]"
+    if with_text and pair.title:
+        png = os.path.join(tmp, "title.png")
+        title_overlay(png, w, h, faces)
+        inputs += ["-loop", "1", "-framerate", str(FPS), "-t", f"{dur:.3f}", "-i", png]
+        extra, last = _overlay_chain("[base]", [(2, 0.0, min(3.05, dur - 0.40), 0.28)])
+        chain += extra
+    chain.append(f"{last}format=yuv420p[vout]")
+
+    run(["ffmpeg", "-v", "error", "-y", *inputs, "-an",
+         "-filter_complex", ";".join(chain), "-map", "[vout]",
+         "-t", f"{dur:.3f}", *enc_args(crf, preset), out], verbose)
+    return dur
+
+
+def render_collage(collage, w, h, out, crf, preset, verbose,
+                   with_text=False, tmp=None, faces=None):
+    """Tile tracked views edge to edge. Each tile is contained, so nothing is cropped."""
+    n = collage.cols * collage.rows
+    srcs = collage.srcs[:n]
+    if len(srcs) != n:
+        raise RuntimeError(f"collage needs {n} clips, got {len(srcs)}")
+    cw, ch = w // collage.cols, h // collage.rows
+    inputs, chain, labels = [], [], []
+    for i, src in enumerate(srcs):
+        path = os.path.join(ROOT, src)
+        ss = collage.starts[i] if i < len(collage.starts) else 0.0
+        speed = collage.speeds[i] if i < len(collage.speeds) else 1.0
+        avail = (probe_duration(path) - ss) / speed
+        if avail < 0.4:
+            ss, speed = 0.0, collage.speeds[i] if i < len(collage.speeds) else 1.0
+        rate = f"setpts=PTS/{speed}," if speed != 1.0 else ""
+        inputs += ["-stream_loop", "-1", "-ss", f"{ss:.3f}", "-i", path]
+        chain.append(
+            f"[{i}:v]{rate}fps={FPS},setpts=PTS-STARTPTS,"
+            f"scale={cw}:{ch}:force_original_aspect_ratio=decrease:flags=lanczos,"
+            f"pad={cw}:{ch}:(ow-iw)/2:(oh-ih)/2:black,setsar=1,format=yuv420p,"
+            f"trim=end={collage.dur:.3f},setpts=PTS-STARTPTS[c{i}]")
+        labels.append(f"[c{i}]")
+        print(f"        {os.path.basename(src):42s} {speed:.1f}x")
+    layout = "|".join(
+        f"{(i % collage.cols) * cw}_{(i // collage.cols) * ch}" for i in range(n))
+    chain.append(f"{''.join(labels)}xstack=inputs={n}:layout={layout}:fill=black[grid]")
+    last = "[grid]"
+    if with_text and collage.title and faces is not None:
+        png = os.path.join(tmp, "title.png")
+        title_overlay(png, w, h, faces)
+        inputs += ["-loop", "1", "-framerate", str(FPS), "-t", f"{collage.dur:.3f}", "-i", png]
+        extra, last = _overlay_chain(
+            "[grid]", [(n, 0.15, min(4.4, collage.dur - 0.35), 0.35)])
+        chain += extra
+    chain.append(f"{last}format=yuv420p[vout]")
+    run(["ffmpeg", "-v", "error", "-y", *inputs, "-an",
+         "-filter_complex", ";".join(chain), "-map", "[vout]",
+         "-t", f"{collage.dur:.3f}", *enc_args(crf, preset), out], verbose)
+    return collage.dur
+
+
+def render_static_dynamic(out, crf, preset, verbose):
+    """3×2 collage of the static/dynamic clips, first page of that section.
+
+    Playback follows the site: DAVIS at 2×, MeViS at 4×. The fountain dancer
+    and the kittens (row 2, column 3) look hurried at that MeViS rate, so
+    those two run at 2×. The grid matches the page order and the clips loop.
+    """
+    SD = "assets/static_dynamic"
+    tiles = [
+        (f"{SD}/davis_great_breakdance-flare.mp4", 2.0),
+        (f"{SD}/mevis_good_410dae675d9a.mp4", 4.0),
+        (f"{SD}/mevis_great_b8ce22e26dde.mp4", 4.0),
+        (f"{SD}/davis_great_dance-jump.mp4", 2.0),
+        (f"{SD}/mevis_great_7fd5537074bd.mp4", 4.0),
+        (f"{SD}/mevis_good_d6c1a055ae91.mp4", 2.0),
+    ]
+    dur = 8.25
+    cols, rows = 3, 2
+    cw, ch = 640, 480
+    inputs, chain, labels = [], [], []
+    for i, (src, speed) in enumerate(tiles):
+        path = os.path.join(ROOT, src)
+        inputs += ["-stream_loop", "-1", "-i", path]
+        chain.append(
+            f"[{i}:v]setpts=PTS/{speed},fps={FPS},"
+            f"scale={cw}:{ch}:flags=lanczos,setsar=1,format=yuv420p,"
+            f"trim=end={dur:.3f},setpts=PTS-STARTPTS[c{i}]")
+        labels.append(f"[c{i}]")
+        print(f"        {os.path.basename(src):42s} {speed:.1f}x")
+    layout = "|".join(
+        f"{(i % cols) * cw}_{(i // cols) * ch}" for i in range(cols * rows))
+    chain.append(f"{''.join(labels)}xstack=inputs={len(tiles)}:layout={layout}:fill=black[vout]")
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    run(["ffmpeg", "-v", "error", "-y", *inputs, "-an",
+         "-filter_complex", ";".join(chain), "-map", "[vout]",
+         "-t", f"{dur:.3f}", *enc_args(crf, preset), out], verbose)
+    return dur
+
+
+def render_full(full, w, h, out, with_text, tmp, faces, crf, preset, verbose):
+    src = os.path.join(ROOT, full.src)
+    avail = (probe_duration(src) - full.ss) / full.speed
+    dur = min(full.dur, avail - 0.05)
+    rate = f"setpts=PTS/{full.speed}," if full.speed != 1.0 else ""
+    if full.contain:
+        fit = (f"scale={w}:{h}:force_original_aspect_ratio=decrease:flags=lanczos,"
+               f"pad={w}:{h}:(ow-iw)/2:(oh-ih)/2:black,setsar=1")
+    else:
+        fit = (f"scale={w}:{h}:force_original_aspect_ratio=increase:flags=lanczos,"
+               f"crop={w}:{h},setsar=1")
+    chain = [
+        f"[0:v]{rate}fps={FPS},setpts=PTS-STARTPTS,{fit}[base]",
+    ]
+    inputs = ["-ss", f"{full.ss:.3f}", "-t", f"{dur * full.speed:.3f}", "-i", src]
+    last = "[base]"
+    if with_text and full.caption:
+        png = os.path.join(tmp, "caption.png")
+        caption_overlay(png, w, h, faces)
+        inputs += ["-loop", "1", "-framerate", str(FPS), "-t", f"{dur:.3f}", "-i", png]
+        # Land after the dissolve in, leave before the dissolve out.
+        extra, last = _overlay_chain(
+            "[base]", [(1, 0.55, dur - 0.45, 0.40)])
+        chain += extra
+    chain.append(f"{last}format=yuv420p[vout]")
+    run(["ffmpeg", "-v", "error", "-y", *inputs, "-an",
+         "-filter_complex", ";".join(chain), "-map", "[vout]",
+         "-t", f"{dur:.3f}", *enc_args(crf, preset), out], verbose)
+    return dur
+
+
+def render_endcard(card, w, h, out, tmp, faces, crf, preset, verbose):
+    png = os.path.join(tmp, "endcard.png")
+    endcard_image(png, w, h, faces)
+    run(["ffmpeg", "-v", "error", "-y",
+         "-loop", "1", "-framerate", str(FPS), "-i", png,
+         "-an", "-vf", "format=yuv420p", "-t", f"{card.dur:.3f}",
+         *enc_args(crf, preset), out], verbose)
+    return card.dur
+
+
+# --------------------------------------------------------------------------- #
 # the edits
 # --------------------------------------------------------------------------- #
 
@@ -433,12 +1006,14 @@ def teaser_edit() -> list:
         Seg(f"{R}/cars.mp4", 0.2, 3.2),
 
         # --- long video -----------------------------------------------------
-        Seg(f"{L}/uptown_1.mp4", 3.0, 7.0, speed=4.5, blur=4, cues=[
+        # Long clips play at 1x on the site. The 37s uptown dance is the one
+        # worth featuring; 1.5x keeps the motion readable in a short beat.
+        Seg(f"{L}/uptown_6.mp4", 2.0, 7.0, speed=1.5, cues=[
             head_cue("1000+ frames, in a single pass", 0.7, 6.4),
             sub_cue("prior dense 3D trackers run out of memory past ~96 frames",
                     1.1, 6.4),
         ]),
-        Seg(f"{L}/pod_3.mp4", 2.0, 6.0, speed=5.5, blur=5, cues=[
+        Seg(f"{L}/pod_3.mp4", 2.0, 6.0, cues=[
             head_cue("under 40 GB of GPU memory", 0.6, 5.4),
             sub_cue("cost scales with scene content, not video length", 1.0, 5.4),
         ]),
@@ -454,10 +1029,8 @@ def teaser_edit() -> list:
                 y=506, size=36, color=WHITE, bold=False),
             Cue("via 3D Scene Representations", 0.5, 5.0,
                 y=552, size=36, color=WHITE, bold=False),
-            Cue("Anonymous Authors",
-                0.9, 5.0, y=640, size=25, color=MUTED, bold=False),
-            Cue("Paper under double-blind review", 1.1, 5.0,
-                y=726, size=25, color=MUTED, bold=False),
+            Cue("Anonymous submission", 1.1, 5.0,
+                y=680, size=32, color=ACCENT, bold=False),
         ]),
     ]
 
@@ -470,11 +1043,54 @@ def hero_edit() -> list:
         Seg(f"{R}/pandas_1.mp4", 2.4, 3.6),
         Seg(f"{R}/tigers.mp4", 1.2, 3.4),
         Seg(f"{R}/ours-breakdance.mp4", 1.8, 3.6),
-        Seg(f"{L}/uptown_1.mp4", 3.0, 4.2, speed=4.5, blur=4),
+        Seg(f"{L}/uptown_6.mp4", 2.0, 4.2, speed=1.5),
         Seg(f"{R}/basketball.mp4", 1.0, 3.4),
         Seg(f"{R}/ours_tennis.mp4", 0.2, 3.2),
-        Seg(f"{L}/pod_3.mp4", 2.0, 3.8, speed=5.5, blur=5),
+        Seg(f"{L}/pod_3.mp4", 2.0, 3.8),
         Seg(f"{R}/ours_horsejump-high_30fps.mp4", 0.0, 2.2),
+    ]
+
+
+S = "assets/som_try"
+
+
+def twitter_edit():
+    """Opens on a 2D collage with the title, then 3D | 2D scenes.
+
+    The robot is a full frame, contained, so the arm is not sliced by the
+    split. Qualitative clips play at the same rate as on the site.
+    """
+    Q = "assets/good_cases"
+    # (path, start, speed). Speed matches the site. Pandas and hands were
+    # encoded at double time, so they play at half speed.
+    tiles = [
+        (f"{S}/pandas_1_2d.mp4", 0.4, 0.5),
+        (f"{S}/tigers_2d.mp4", 0.4, 1.0),
+        (f"{S}/fish_2d.mp4", 0.3, 1.0),
+        (f"{S}/cats_2d.mp4", 0.2, 1.0),
+        (f"{Q}/davis_hockey.mp4", 0.4, 2.0),
+        (f"{Q}/davis_train.mp4", 0.4, 2.0),
+        (f"{S}/hands_2d.mp4", 0.6, 0.5),
+        (f"{S}/swing_2d.mp4", 0.4, 1.0),
+        (f"{Q}/davis_dog.mp4", 0.3, 2.0),
+        (f"{Q}/davis_dance-twirl.mp4", 0.4, 2.0),
+        (f"{Q}/mevis_9f542dded87c.mp4", 0.6, 4.0),
+        (f"{Q}/mevis_a9402f575b5c.mp4", 0.6, 4.0),
+    ]
+    return [
+        Collage([s for s, _, _ in tiles], [t for _, t, _ in tiles],
+                cols=4, rows=3, dur=5.2,
+                speeds=[v for _, _, v in tiles], title=True),
+        Pair(f"{S}/pandas_1_3d.mp4", f"{S}/pandas_1_2d.mp4",
+             ss=0.4, dur=6.8, speed=0.5),
+        Pair(f"{S}/tigers_3d.mp4", f"{S}/tigers_2d.mp4", ss=0.12, dur=2.55),
+        # Play through to the end of the clip. A short dur was cutting it off.
+        Pair(f"{S}/robot_1_3d.mp4", f"{S}/robot_1_2d.mp4", ss=1.0, dur=30.0),
+        Pair(f"{S}/breakdance_3d.mp4", f"{S}/breakdance_2d.mp4", ss=1.6, dur=3.20),
+        Pair(f"{S}/tennis_3d.mp4", f"{S}/tennis_2d.mp4", ss=0.5, dur=2.80),
+        Pair(f"{S}/hands_3d.mp4", f"{S}/hands_2d.mp4", ss=0.6, dur=5.8, speed=0.5),
+        Full(f"{L}/uptown_6.mp4", ss=2.0, dur=6.5, speed=1.5, caption=True),
+        EndCard(3.8),
     ]
 
 
@@ -484,7 +1100,7 @@ def hero_edit() -> list:
 
 def build(edit: list, w: int, h: int, out: str, with_text: bool, xfade: float,
           fade_in: float, fade_out: float, loop_fold: float,
-          crf: int, preset: str, verbose: bool) -> None:
+          crf: int, preset: str, verbose: bool, faces=None) -> None:
     print(f"\n=> {os.path.relpath(out, ROOT)}  ({w}x{h}, "
           f"{'with text' if with_text else 'no text'})")
     tmp = tempfile.mkdtemp(prefix="te_teaser_")
@@ -505,6 +1121,24 @@ def build(edit: list, w: int, h: int, out: str, with_text: bool, xfade: float,
                     continue
                 label = "end card"
                 d = render_card(item, w, h, part, tmp, crf, preset, verbose)
+            elif isinstance(item, Pair):
+                label = os.path.basename(item.left).replace("_3d.mp4", "")
+                d = render_pair(item, w, h, part, with_text, tmp, faces,
+                                crf, preset, verbose)
+            elif isinstance(item, Collage):
+                label = f"collage {item.cols}x{item.rows}"
+                d = render_collage(item, w, h, part, crf, preset, verbose,
+                                   with_text, tmp, faces)
+            elif isinstance(item, Full):
+                label = os.path.basename(item.src)
+                d = render_full(item, w, h, part, with_text, tmp, faces,
+                                crf, preset, verbose)
+            elif isinstance(item, EndCard):
+                if not with_text:
+                    continue
+                label = "end card"
+                d = render_endcard(item, w, h, part, tmp, faces,
+                                   crf, preset, verbose)
             else:
                 raise TypeError(item)
             print(f"   [{i:02d}] {label:44s} {d:5.2f}s")
@@ -524,7 +1158,7 @@ def build(edit: list, w: int, h: int, out: str, with_text: bool, xfade: float,
         shutil.rmtree(tmp, ignore_errors=True)
 
 
-TARGETS = ("hero", "teaser-plain", "teaser-text")
+TARGETS = ("hero", "teaser-plain", "teaser-text", "twitter", "static-dynamic")
 
 
 def main() -> int:
@@ -548,15 +1182,31 @@ def main() -> int:
         if not shutil.which(tool):
             print(f"error: {tool} not found on PATH", file=sys.stderr)
             return 1
-    for font in (FONT_BOLD, FONT_REG):
-        if not os.path.exists(font):
-            print(f"error: font not found: {font}", file=sys.stderr)
-            return 1
 
     preset = "veryfast" if args.fast else "slow"
     hero_crf = 28 if args.fast else HERO_CRF
     teaser_crf = 26 if args.fast else TEASER_CRF
-    targets = args.targets or list(TARGETS)
+    # medium is visually indistinguishable from slow on this footage and several
+    # times faster; the twitter file is short enough that crf does the work.
+    tw_preset = "veryfast" if args.fast else "medium"
+    # Point clouds are close to noise, so x264 spends bits on them. 20 is still
+    # sharp on a phone, and well above what Twitter keeps after it recompresses.
+    tw_crf = 24 if args.fast else 20
+    targets = args.targets or [t for t in TARGETS if t not in ("twitter", "static-dynamic")]
+
+    if "teaser-text" in targets:
+        if not ffmpeg_has_filter("drawtext"):
+            print("error: this ffmpeg has no drawtext filter, which the long "
+                  "teaser needs for captions.\n"
+                  "       the twitter cut does not: "
+                  "scripts/make_teaser.py twitter", file=sys.stderr)
+            return 1
+        for font in (FONT_BOLD, FONT_REG):
+            if not os.path.exists(font):
+                print(f"error: font not found: {font}", file=sys.stderr)
+                return 1
+
+    faces = load_fonts() if "twitter" in targets else None
 
     if "hero" in targets:
         build(hero_edit(), *HERO_SIZE, os.path.join(OUT_DIR, "hero_loop.mp4"),
@@ -571,6 +1221,19 @@ def main() -> int:
                   with_text=with_text, xfade=XFADE, fade_in=0.8, fade_out=1.0,
                   loop_fold=0.0, crf=teaser_crf, preset=preset,
                   verbose=args.verbose)
+
+    if "twitter" in targets:
+        build(twitter_edit(), *TEASER_SIZE,
+              os.path.join(OUT_DIR, "twitter.mp4"),
+              with_text=True, xfade=XFADE_TW, fade_in=0.0, fade_out=0.0,
+              loop_fold=0.0, crf=tw_crf, preset=tw_preset,
+              verbose=args.verbose, faces=faces)
+
+    if "static-dynamic" in targets:
+        out = os.path.join(OUT_DIR, "static_dynamic.mp4")
+        print(f"\n=> {os.path.relpath(out, ROOT)}  (1920x960)")
+        render_static_dynamic(out, tw_crf, tw_preset, args.verbose)
+        print(f"   done: {probe_duration(out):.1f}s, {os.path.getsize(out) / 1e6:.1f} MB")
 
     print(f"\nOutputs in {os.path.relpath(OUT_DIR, ROOT)}/")
     return 0

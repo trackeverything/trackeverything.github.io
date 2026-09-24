@@ -245,6 +245,12 @@ strong {
     margin-top: 1.85rem;
 }
 
+.coming-soon {
+    margin-top: 0.7rem;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
 .btn {
     display: inline-flex;
     align-items: center;
