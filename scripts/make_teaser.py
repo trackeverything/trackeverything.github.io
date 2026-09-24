@@ -154,7 +154,9 @@ class Collage:
     These are the 2D track renders, which already fill the frame. The 3D
     plates are left out: newer ones are white and older ones are black, and a
     grid of both would show as stripes. Each tile is contained, not cropped.
-    `speeds` matches the site: 1× for the som clips, 2× DAVIS, 4× MeViS.
+    `speeds` matches the site: 0.5× for the in-the-wild clips that were
+    encoded fast (pandas, hands), 1× for the other som clips, 2× DAVIS,
+    4× MeViS.
     """
     srcs: list[str]
     starts: list[float]
@@ -1076,15 +1078,16 @@ def twitter_edit():
     split. Qualitative clips play at the same rate as on the site.
     """
     Q = "assets/good_cases"
-    # (path, start). Speed is the site rate: som clips are already realtime.
+    # (path, start, speed). Speed matches the site. Pandas and hands were
+    # encoded at double time, so they play at half speed.
     tiles = [
-        (f"{S}/pandas_1_2d.mp4", 0.4, 1.0),
+        (f"{S}/pandas_1_2d.mp4", 0.4, 0.5),
         (f"{S}/tigers_2d.mp4", 0.4, 1.0),
         (f"{S}/fish_2d.mp4", 0.3, 1.0),
         (f"{S}/cats_2d.mp4", 0.2, 1.0),
         (f"{Q}/davis_hockey.mp4", 0.4, 2.0),
         (f"{Q}/davis_train.mp4", 0.4, 2.0),
-        (f"{S}/hands_2d.mp4", 0.6, 0.6),
+        (f"{S}/hands_2d.mp4", 0.6, 0.5),
         (f"{S}/swing_2d.mp4", 0.4, 1.0),
         (f"{Q}/davis_dog.mp4", 0.3, 2.0),
         (f"{Q}/davis_dance-twirl.mp4", 0.4, 2.0),
@@ -1096,9 +1099,9 @@ def twitter_edit():
                 cols=4, rows=3, dur=5.2,
                 speeds=[v for _, _, v in tiles], title=True),
         Pair(f"{S}/pandas_1_3d.mp4", f"{S}/pandas_1_2d.mp4",
-             ss=0.4, dur=3.4),
+             ss=0.4, dur=6.8, speed=0.5),
         Pair(f"{S}/tigers_3d.mp4", f"{S}/tigers_2d.mp4", ss=0.12, dur=2.55),
-        Pair(f"{S}/hands_3d.mp4", f"{S}/hands_2d.mp4", ss=0.6, dur=4.8, speed=0.6),
+        Pair(f"{S}/hands_3d.mp4", f"{S}/hands_2d.mp4", ss=0.6, dur=5.8, speed=0.5),
         Pair(f"{S}/breakdance_3d.mp4", f"{S}/breakdance_2d.mp4", ss=1.6, dur=3.20),
         Pair(f"{S}/tennis_3d.mp4", f"{S}/tennis_2d.mp4", ss=0.5, dur=2.80),
         # Play through to the end of the clip. A short dur was cutting it off.

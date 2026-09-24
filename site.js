@@ -33,10 +33,20 @@ const setupSequenceViewer = () => {
 
 /* Low-FPS qualitative clips play faster so demos feel snappier.
    DAVIS / PStudio / POD are ~12 fps → 2x (~24 fps effective).
-   MeViS is ~4 fps → 4x (~16 fps effective). */
+   MeViS is ~4 fps → 4x (~16 fps effective).
+
+   The newer in-the-wild renders (panda, goats, cow, cars, hands, sheep
+   with a person) were encoded at double real time. Play those at half
+   speed so the motion reads as natural. */
+const HALF_SPEED = /\/(pandas_1|goats|cow_1|cars|hands|goat_human)(?:_|\.)/;
+
 const applyPlaybackRate = (video) => {
   if (!video) return;
   const src = video.getAttribute("src") || video.dataset.src || "";
+  if (HALF_SPEED.test(src)) {
+    video.playbackRate = 0.5;
+    return;
+  }
   const isQual =
     src.includes("/good_cases/") ||
     src.includes("/failure_cases/") ||
