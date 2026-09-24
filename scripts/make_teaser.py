@@ -136,13 +136,14 @@ class Pair:
     """3D tracks on the left, 2D tracks on the right, filling a 16:9 frame.
 
     The left plate is contained and padded with the clip's own background
-    (white or black). The right plate is cover-cropped so the input view
-    bleeds to the edges.
+    (white or black). The right plate is contained too, so the 2D view is
+    not cropped; the spare band uses the same background as the 3D plate.
     """
     left: str
     right: str
     ss: float = 0.0
     dur: float = 3.0
+    speed: float = 1.0          # <1 slows the shot down
     title: bool = False
 
 
@@ -152,22 +153,27 @@ class Collage:
 
     These are the 2D track renders, which already fill the frame. The 3D
     plates are left out: newer ones are white and older ones are black, and a
-    grid of both would show as stripes.
+    grid of both would show as stripes. Each tile is contained, not cropped.
+    `speeds` matches the site: 1× for the som clips, 2× DAVIS, 4× MeViS.
     """
     srcs: list[str]
     starts: list[float]
     cols: int
     rows: int
     dur: float
+    speeds: list[float] = field(default_factory=list)
+    title: bool = False
 
 
 @dataclass
 class Full:
-    """One clip, cover-cropped to the whole frame."""
+    """One clip filling the frame. Cover-crop by default; contain keeps every pixel."""
     src: str
     ss: float = 0.0
     dur: float = 4.0
+    speed: float = 1.0
     caption: bool = False
+    contain: bool = False
 
 
 @dataclass
@@ -679,27 +685,36 @@ def draw_centered(base, draw, text, font, y, fill, shadow=False):
 
 
 def title_overlay(path, w, h, faces):
-    """Opening title. A top scrim keeps the white type readable on both plates,
-    and it fades out with the title so the shot finishes clean."""
+    """Opening title, centered. A soft middle scrim keeps the type readable."""
     np, Image, ImageDraw, _, _ = _libs()
     im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    grad_h = 500
-    alpha = (168 * (1 - np.linspace(0, 1, grad_h)) ** 1.55).astype("uint8")
+    ys = np.arange(h)
+    alpha = (185 * np.exp(-0.5 * ((ys - h / 2) / 230) ** 2)).astype("uint8")
     arr = np.zeros((h, w, 4), dtype="uint8")
-    arr[:grad_h, :, 3] = alpha[:, None]
+    arr[:, :, 3] = alpha[:, None]
     im.alpha_composite(Image.fromarray(arr))
     draw = ImageDraw.Draw(im)
-    serif = faces.face(faces.serif_path, 112, faces.serif_index)
-    sans = faces.face(faces.sans_path, 44, faces.idx_med)
-    # Shrink the name if a fallback serif runs wide.
-    for size in range(112, 78, -2):
+    serif = faces.face(faces.serif_path, 108, faces.serif_index)
+    for size in range(108, 78, -2):
         serif = faces.face(faces.serif_path, size, faces.serif_index)
         tw, _ = _text_width(draw, "TrackEverything", serif)
         if tw <= w - 160:
             break
-    draw = draw_centered(im, draw, "TrackEverything", serif, 86,
+    line_a = "long-horizon dense 3D tracking"
+    line_b = "with de-duplicating 3D representations"
+    sub = faces.face(faces.sans_path, 36, faces.idx_med)
+    for size in range(40, 26, -1):
+        sub = faces.face(faces.sans_path, size, faces.idx_med)
+        wa, _ = _text_width(draw, line_a, sub)
+        wb, _ = _text_width(draw, line_b, sub)
+        if max(wa, wb) <= w - 140:
+            break
+    mid = h // 2
+    draw = draw_centered(im, draw, "TrackEverything", serif, mid - 90,
                          (255, 255, 255, 255), shadow=True)
-    draw_centered(im, draw, "every point, tracked in 3D", sans, 224,
+    draw = draw_centered(im, draw, line_a, sub, mid + 30,
+                         (255, 255, 255, 240), shadow=True)
+    draw_centered(im, draw, line_b, sub, mid + 86,
                   (255, 255, 255, 235), shadow=True)
     im.save(path)
 
@@ -714,11 +729,11 @@ def caption_overlay(path, w, h, faces):
     arr[h - grad_h:, :, 3] = alpha[:, None]
     im.alpha_composite(Image.fromarray(arr))
     draw = ImageDraw.Draw(im)
-    bold = faces.face(faces.bold_path, 72, faces.idx_bold)
+    bold = faces.face(faces.bold_path, 52, faces.idx_bold)
     med = faces.face(faces.sans_path, 36, faces.idx_med)
-    draw = draw_centered(im, draw, "1,000+ frames", bold, h - 196,
-                         (255, 255, 255, 255), shadow=True)
-    draw_centered(im, draw, "every point, in one pass", med, h - 108,
+    draw = draw_centered(im, draw, "Tracking Everything in 1000–2000 Frames", bold,
+                         h - 188, (255, 255, 255, 255), shadow=True)
+    draw_centered(im, draw, "(under 40G memory)", med, h - 112,
                   (255, 255, 255, 230), shadow=True)
     im.save(path)
 
@@ -776,7 +791,7 @@ def _overlay_chain(base, specs):
 def render_pair(pair, w, h, out, with_text, tmp, faces, crf, preset, verbose):
     left = os.path.join(ROOT, pair.left)
     right = os.path.join(ROOT, pair.right)
-    avail = min(probe_duration(left), probe_duration(right)) - pair.ss
+    avail = (min(probe_duration(left), probe_duration(right)) - pair.ss) / pair.speed
     dur = min(pair.dur, avail - 0.04)
     if dur < 0.4:
         raise RuntimeError(f"{pair.left} is too short from {pair.ss}")
@@ -794,17 +809,19 @@ def render_pair(pair, w, h, out, with_text, tmp, faces, crf, preset, verbose):
     else:
         print(f"        plate {pad}")
 
+    rate = f"setpts=PTS/{pair.speed}," if pair.speed != 1.0 else ""
     chain = [
-        f"[0:v]fps={FPS},setpts=PTS-STARTPTS,{crop_f}"
+        f"[0:v]{rate}fps={FPS},setpts=PTS-STARTPTS,{crop_f}"
         f"scale={pw}:{ph}:force_original_aspect_ratio=decrease:flags=lanczos,"
         f"pad={pw}:{ph}:(ow-iw)/2:(oh-ih)/2:color={pad},setsar=1,format=yuv420p[l]",
-        f"[1:v]fps={FPS},setpts=PTS-STARTPTS,"
-        f"scale={pw}:{ph}:force_original_aspect_ratio=increase:flags=lanczos,"
-        f"crop={pw}:{ph},setsar=1,format=yuv420p[r]",
+        f"[1:v]{rate}fps={FPS},setpts=PTS-STARTPTS,"
+        f"scale={pw}:{ph}:force_original_aspect_ratio=decrease:flags=lanczos,"
+        f"pad={pw}:{ph}:(ow-iw)/2:(oh-ih)/2:color={pad},setsar=1,format=yuv420p[r]",
         "[l][r]hstack=inputs=2[base]",
     ]
-    inputs = ["-ss", f"{pair.ss:.3f}", "-t", f"{dur:.3f}", "-i", left,
-              "-ss", f"{pair.ss:.3f}", "-t", f"{dur:.3f}", "-i", right]
+    src_t = dur * pair.speed
+    inputs = ["-ss", f"{pair.ss:.3f}", "-t", f"{src_t:.3f}", "-i", left,
+              "-ss", f"{pair.ss:.3f}", "-t", f"{src_t:.3f}", "-i", right]
     last = "[base]"
     if with_text and pair.title:
         png = os.path.join(tmp, "title.png")
@@ -820,8 +837,9 @@ def render_pair(pair, w, h, out, with_text, tmp, faces, crf, preset, verbose):
     return dur
 
 
-def render_collage(collage, w, h, out, crf, preset, verbose):
-    """Tile tracked views edge to edge. 4×3 of the 4:3 sources fills 1080p."""
+def render_collage(collage, w, h, out, crf, preset, verbose,
+                   with_text=False, tmp=None, faces=None):
+    """Tile tracked views edge to edge. Each tile is contained, so nothing is cropped."""
     n = collage.cols * collage.rows
     srcs = collage.srcs[:n]
     if len(srcs) != n:
@@ -831,36 +849,91 @@ def render_collage(collage, w, h, out, crf, preset, verbose):
     for i, src in enumerate(srcs):
         path = os.path.join(ROOT, src)
         ss = collage.starts[i] if i < len(collage.starts) else 0.0
-        avail = probe_duration(path)
-        if ss > avail - 0.25:
-            ss = 0.0
-        # Loop so a short clip still fills the beat. Seeking before the input
-        # starts each tile where the trails already exist.
+        speed = collage.speeds[i] if i < len(collage.speeds) else 1.0
+        avail = (probe_duration(path) - ss) / speed
+        if avail < 0.4:
+            ss, speed = 0.0, collage.speeds[i] if i < len(collage.speeds) else 1.0
+        rate = f"setpts=PTS/{speed}," if speed != 1.0 else ""
         inputs += ["-stream_loop", "-1", "-ss", f"{ss:.3f}", "-i", path]
         chain.append(
-            f"[{i}:v]fps={FPS},setpts=PTS-STARTPTS,"
-            f"scale={cw}:{ch}:flags=lanczos,setsar=1,format=yuv420p,"
+            f"[{i}:v]{rate}fps={FPS},setpts=PTS-STARTPTS,"
+            f"scale={cw}:{ch}:force_original_aspect_ratio=decrease:flags=lanczos,"
+            f"pad={cw}:{ch}:(ow-iw)/2:(oh-ih)/2:black,setsar=1,format=yuv420p,"
             f"trim=end={collage.dur:.3f},setpts=PTS-STARTPTS[c{i}]")
         labels.append(f"[c{i}]")
+        print(f"        {os.path.basename(src):42s} {speed:.1f}x")
     layout = "|".join(
         f"{(i % collage.cols) * cw}_{(i // collage.cols) * ch}" for i in range(n))
-    chain.append(f"{''.join(labels)}xstack=inputs={n}:layout={layout}:fill=black[vout]")
+    chain.append(f"{''.join(labels)}xstack=inputs={n}:layout={layout}:fill=black[grid]")
+    last = "[grid]"
+    if with_text and collage.title and faces is not None:
+        png = os.path.join(tmp, "title.png")
+        title_overlay(png, w, h, faces)
+        inputs += ["-loop", "1", "-framerate", str(FPS), "-t", f"{collage.dur:.3f}", "-i", png]
+        extra, last = _overlay_chain(
+            "[grid]", [(n, 0.15, min(4.4, collage.dur - 0.35), 0.35)])
+        chain += extra
+    chain.append(f"{last}format=yuv420p[vout]")
     run(["ffmpeg", "-v", "error", "-y", *inputs, "-an",
          "-filter_complex", ";".join(chain), "-map", "[vout]",
          "-t", f"{collage.dur:.3f}", *enc_args(crf, preset), out], verbose)
     return collage.dur
 
 
+def render_static_dynamic(out, crf, preset, verbose):
+    """3×2 collage of the static/dynamic clips, first page of that section.
+
+    Playback follows the site: DAVIS at 2×, MeViS at 4×. The fountain dancer
+    and the kittens (row 2, column 3) look hurried at that MeViS rate, so
+    those two run at 2×. The grid matches the page order and the clips loop.
+    """
+    SD = "assets/static_dynamic"
+    tiles = [
+        (f"{SD}/davis_great_breakdance-flare.mp4", 2.0),
+        (f"{SD}/mevis_good_410dae675d9a.mp4", 4.0),
+        (f"{SD}/mevis_great_b8ce22e26dde.mp4", 4.0),
+        (f"{SD}/davis_great_dance-jump.mp4", 2.0),
+        (f"{SD}/mevis_great_7fd5537074bd.mp4", 4.0),
+        (f"{SD}/mevis_good_d6c1a055ae91.mp4", 2.0),
+    ]
+    dur = 8.25
+    cols, rows = 3, 2
+    cw, ch = 640, 480
+    inputs, chain, labels = [], [], []
+    for i, (src, speed) in enumerate(tiles):
+        path = os.path.join(ROOT, src)
+        inputs += ["-stream_loop", "-1", "-i", path]
+        chain.append(
+            f"[{i}:v]setpts=PTS/{speed},fps={FPS},"
+            f"scale={cw}:{ch}:flags=lanczos,setsar=1,format=yuv420p,"
+            f"trim=end={dur:.3f},setpts=PTS-STARTPTS[c{i}]")
+        labels.append(f"[c{i}]")
+        print(f"        {os.path.basename(src):42s} {speed:.1f}x")
+    layout = "|".join(
+        f"{(i % cols) * cw}_{(i // cols) * ch}" for i in range(cols * rows))
+    chain.append(f"{''.join(labels)}xstack=inputs={len(tiles)}:layout={layout}:fill=black[vout]")
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    run(["ffmpeg", "-v", "error", "-y", *inputs, "-an",
+         "-filter_complex", ";".join(chain), "-map", "[vout]",
+         "-t", f"{dur:.3f}", *enc_args(crf, preset), out], verbose)
+    return dur
+
+
 def render_full(full, w, h, out, with_text, tmp, faces, crf, preset, verbose):
     src = os.path.join(ROOT, full.src)
-    avail = probe_duration(src) - full.ss
+    avail = (probe_duration(src) - full.ss) / full.speed
     dur = min(full.dur, avail - 0.05)
+    rate = f"setpts=PTS/{full.speed}," if full.speed != 1.0 else ""
+    if full.contain:
+        fit = (f"scale={w}:{h}:force_original_aspect_ratio=decrease:flags=lanczos,"
+               f"pad={w}:{h}:(ow-iw)/2:(oh-ih)/2:black,setsar=1")
+    else:
+        fit = (f"scale={w}:{h}:force_original_aspect_ratio=increase:flags=lanczos,"
+               f"crop={w}:{h},setsar=1")
     chain = [
-        f"[0:v]fps={FPS},setpts=PTS-STARTPTS,"
-        f"scale={w}:{h}:force_original_aspect_ratio=increase:flags=lanczos,"
-        f"crop={w}:{h},setsar=1[base]",
+        f"[0:v]{rate}fps={FPS},setpts=PTS-STARTPTS,{fit}[base]",
     ]
-    inputs = ["-ss", f"{full.ss:.3f}", "-t", f"{dur:.3f}", "-i", src]
+    inputs = ["-ss", f"{full.ss:.3f}", "-t", f"{dur * full.speed:.3f}", "-i", src]
     last = "[base]"
     if with_text and full.caption:
         png = os.path.join(tmp, "caption.png")
@@ -941,12 +1014,14 @@ def teaser_edit() -> list:
         Seg(f"{R}/cars.mp4", 0.2, 3.2),
 
         # --- long video -----------------------------------------------------
-        Seg(f"{L}/uptown_1.mp4", 3.0, 7.0, speed=4.5, blur=4, cues=[
+        # Long clips play at 1x on the site. The 37s uptown dance is the one
+        # worth featuring; 1.5x keeps the motion readable in a short beat.
+        Seg(f"{L}/uptown_6.mp4", 2.0, 7.0, speed=1.5, cues=[
             head_cue("1000+ frames, in a single pass", 0.7, 6.4),
             sub_cue("prior dense 3D trackers run out of memory past ~96 frames",
                     1.1, 6.4),
         ]),
-        Seg(f"{L}/pod_3.mp4", 2.0, 6.0, speed=5.5, blur=5, cues=[
+        Seg(f"{L}/pod_3.mp4", 2.0, 6.0, cues=[
             head_cue("under 40 GB of GPU memory", 0.6, 5.4),
             sub_cue("cost scales with scene content, not video length", 1.0, 5.4),
         ]),
@@ -983,10 +1058,10 @@ def hero_edit() -> list:
         Seg(f"{R}/pandas_1.mp4", 2.4, 3.6),
         Seg(f"{R}/tigers.mp4", 1.2, 3.4),
         Seg(f"{R}/ours-breakdance.mp4", 1.8, 3.6),
-        Seg(f"{L}/uptown_1.mp4", 3.0, 4.2, speed=4.5, blur=4),
+        Seg(f"{L}/uptown_6.mp4", 2.0, 4.2, speed=1.5),
         Seg(f"{R}/basketball.mp4", 1.0, 3.4),
         Seg(f"{R}/ours_tennis.mp4", 0.2, 3.2),
-        Seg(f"{L}/pod_3.mp4", 2.0, 3.8, speed=5.5, blur=5),
+        Seg(f"{L}/pod_3.mp4", 2.0, 3.8),
         Seg(f"{R}/ours_horsejump-high_30fps.mp4", 0.0, 2.2),
     ]
 
@@ -995,42 +1070,40 @@ S = "assets/som_try"
 
 
 def twitter_edit():
-    """~35s, 1920x1080. Mostly the pictures.
+    """Opens on a 2D collage with the title, then 3D | 2D scenes.
 
-    A few single scenes, so the 3D | 2D split is readable, then a collage of
-    many tracked videos, then the long dance. The collage sits between those
-    two: the singles explain the method, the grid shows the range, the dance
-    shows that it holds for a thousand frames.
+    The robot is a full frame, contained, so the arm is not sliced by the
+    split. Qualitative clips play at the same rate as on the site.
     """
-    # 2D track views only. Each is 4:3, so twelve of them fill 1920x1080
-    # with no bars and no white/black plates to reconcile.
-    collage = [
-        (f"{S}/pandas_1_2d.mp4", 1.2),
-        (f"{S}/tigers_2d.mp4", 0.8),
-        (f"{S}/fish_2d.mp4", 0.8),
-        (f"{S}/cats_2d.mp4", 0.6),
-        (f"{S}/hands_2d.mp4", 2.2),
-        (f"{S}/robot_1_2d.mp4", 4.5),
-        (f"{S}/swing_2d.mp4", 1.1),
-        (f"{S}/cow_1_2d.mp4", 0.8),
-        (f"{S}/breakdance_2d.mp4", 2.0),
-        (f"{S}/dance-jump_2d.mp4", 1.2),
-        (f"{S}/tennis_2d.mp4", 1.0),
-        (f"{S}/horsejump-high_2d.mp4", 0.6),
+    Q = "assets/good_cases"
+    # (path, start). Speed is the site rate: som clips are already realtime.
+    tiles = [
+        (f"{S}/pandas_1_2d.mp4", 0.4, 1.0),
+        (f"{S}/tigers_2d.mp4", 0.4, 1.0),
+        (f"{S}/fish_2d.mp4", 0.3, 1.0),
+        (f"{S}/cats_2d.mp4", 0.2, 1.0),
+        (f"{Q}/davis_hockey.mp4", 0.4, 2.0),
+        (f"{Q}/davis_train.mp4", 0.4, 2.0),
+        (f"{S}/hands_2d.mp4", 0.6, 0.6),
+        (f"{S}/swing_2d.mp4", 0.4, 1.0),
+        (f"{Q}/davis_dog.mp4", 0.3, 2.0),
+        (f"{Q}/davis_dance-twirl.mp4", 0.4, 2.0),
+        (f"{Q}/mevis_9f542dded87c.mp4", 0.6, 4.0),
+        (f"{Q}/mevis_a9402f575b5c.mp4", 0.6, 4.0),
     ]
     return [
+        Collage([s for s, _, _ in tiles], [t for _, t, _ in tiles],
+                cols=4, rows=3, dur=5.2,
+                speeds=[v for _, _, v in tiles], title=True),
         Pair(f"{S}/pandas_1_3d.mp4", f"{S}/pandas_1_2d.mp4",
-             ss=0.7, dur=4.0, title=True),
+             ss=0.4, dur=3.4),
         Pair(f"{S}/tigers_3d.mp4", f"{S}/tigers_2d.mp4", ss=0.12, dur=2.55),
-        Pair(f"{S}/cats_3d.mp4", f"{S}/cats_2d.mp4", ss=0.12, dur=2.30),
-        Pair(f"{S}/hands_3d.mp4", f"{S}/hands_2d.mp4", ss=2.0, dur=2.90),
-        Pair(f"{S}/fish_3d.mp4", f"{S}/fish_2d.mp4", ss=0.35, dur=3.00),
-        Pair(f"{S}/robot_1_3d.mp4", f"{S}/robot_1_2d.mp4", ss=4.0, dur=3.30),
-        Pair(f"{S}/breakdance_3d.mp4", f"{S}/breakdance_2d.mp4", ss=1.6, dur=3.50),
-        Pair(f"{S}/tennis_3d.mp4", f"{S}/tennis_2d.mp4", ss=0.7, dur=3.00),
-        Collage([s for s, _ in collage], [t for _, t in collage],
-                cols=4, rows=3, dur=4.4),
-        Full(f"{L}/uptown_5.mp4", ss=8.5, dur=5.4, caption=True),
+        Pair(f"{S}/hands_3d.mp4", f"{S}/hands_2d.mp4", ss=0.6, dur=4.8, speed=0.6),
+        Pair(f"{S}/breakdance_3d.mp4", f"{S}/breakdance_2d.mp4", ss=1.6, dur=3.20),
+        Pair(f"{S}/tennis_3d.mp4", f"{S}/tennis_2d.mp4", ss=0.5, dur=2.80),
+        # Play through to the end of the clip. A short dur was cutting it off.
+        Pair(f"{S}/robot_1_3d.mp4", f"{S}/robot_1_2d.mp4", ss=1.0, dur=30.0),
+        Full(f"{L}/uptown_6.mp4", ss=2.0, dur=6.5, speed=1.5, caption=True),
         EndCard(3.8),
     ]
 
@@ -1068,7 +1141,8 @@ def build(edit: list, w: int, h: int, out: str, with_text: bool, xfade: float,
                                 crf, preset, verbose)
             elif isinstance(item, Collage):
                 label = f"collage {item.cols}x{item.rows}"
-                d = render_collage(item, w, h, part, crf, preset, verbose)
+                d = render_collage(item, w, h, part, crf, preset, verbose,
+                                   with_text, tmp, faces)
             elif isinstance(item, Full):
                 label = os.path.basename(item.src)
                 d = render_full(item, w, h, part, with_text, tmp, faces,
@@ -1098,7 +1172,7 @@ def build(edit: list, w: int, h: int, out: str, with_text: bool, xfade: float,
         shutil.rmtree(tmp, ignore_errors=True)
 
 
-TARGETS = ("hero", "teaser-plain", "teaser-text", "twitter")
+TARGETS = ("hero", "teaser-plain", "teaser-text", "twitter", "static-dynamic")
 
 
 def main() -> int:
@@ -1132,7 +1206,7 @@ def main() -> int:
     # Point clouds are close to noise, so x264 spends bits on them. 20 is still
     # sharp on a phone, and well above what Twitter keeps after it recompresses.
     tw_crf = 24 if args.fast else 20
-    targets = args.targets or [t for t in TARGETS if t != "twitter"]
+    targets = args.targets or [t for t in TARGETS if t not in ("twitter", "static-dynamic")]
 
     if "teaser-text" in targets:
         if not ffmpeg_has_filter("drawtext"):
@@ -1168,6 +1242,12 @@ def main() -> int:
               with_text=True, xfade=XFADE_TW, fade_in=0.0, fade_out=0.0,
               loop_fold=0.0, crf=tw_crf, preset=tw_preset,
               verbose=args.verbose, faces=faces)
+
+    if "static-dynamic" in targets:
+        out = os.path.join(OUT_DIR, "static_dynamic.mp4")
+        print(f"\n=> {os.path.relpath(out, ROOT)}  (1920x960)")
+        render_static_dynamic(out, tw_crf, tw_preset, args.verbose)
+        print(f"   done: {probe_duration(out):.1f}s, {os.path.getsize(out) / 1e6:.1f} MB")
 
     print(f"\nOutputs in {os.path.relpath(OUT_DIR, ROOT)}/")
     return 0
