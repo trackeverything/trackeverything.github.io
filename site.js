@@ -461,6 +461,45 @@ const setupLightbox = () => {
   });
 };
 
+/* Each comparison row is the same sequence. The clips start whenever
+   they finish loading, so without a shared clock the row drifts, and the
+   drift is obvious once MeViS is playing at 4x. */
+const setupCompareSync = () => {
+  const videos = [...document.querySelectorAll(".compare-grid video")];
+  for (let i = 0; i < videos.length; i += 4) {
+    const row = videos.slice(i, i + 4);
+    if (row.length < 4) continue;
+
+    const lead = row[0];
+    let locking = false;
+    const align = () => {
+      if (locking || lead.readyState < 2) return;
+      locking = true;
+      const t = lead.currentTime;
+      row.forEach((video) => {
+        if (video === lead || video.readyState < 1) return;
+        if (Number.isFinite(video.duration) && Math.abs(video.currentTime - t) > 0.25) {
+          video.currentTime = Math.min(t, Math.max(0, video.duration - 0.05));
+        }
+        if (lead.paused) {
+          if (!video.paused) video.pause();
+        } else if (video.paused) {
+          video.play().catch(() => {});
+        }
+      });
+      locking = false;
+    };
+
+    lead.addEventListener("play", align);
+    lead.addEventListener("seeked", align);
+    lead.addEventListener("timeupdate", align);
+    row.slice(1).forEach((video) => {
+      video.addEventListener("play", align);
+      video.addEventListener("loadeddata", align);
+    });
+  }
+};
+
 /* Keep Input / 3D / 2D in each SOM row on the same clock. The three
    files share duration and fps; browsers still drift on looped autoplay. */
 const setupSomSync = () => {
@@ -507,5 +546,6 @@ const setupSomSync = () => {
 setupSequenceViewer();
 setupVideoPlayback();
 setupClipRails();
+setupCompareSync();
 setupSomSync();
 setupLightbox();
