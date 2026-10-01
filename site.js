@@ -57,7 +57,11 @@ const applyPlaybackRate = (video) => {
     video.playbackRate = 1;
     return;
   }
-  video.playbackRate = /mevis_/i.test(src) ? 4 : 2;
+  /* Ours MeViS renders are named ours_<id>, without "mevis_" in the path,
+     so match those ids too. Otherwise they play at the DAVIS 2x rate and
+     look half as fast as the baselines beside them. */
+  const isMevis = /mevis_/i.test(src) || /\/ours_[0-9a-f]{6,}/i.test(src);
+  video.playbackRate = isMevis ? 4 : 2;
 };
 
 const ensureSource = (video) => {
