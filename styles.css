@@ -547,6 +547,32 @@ figcaption,
     margin-inline: auto;
 }
 
+.compare-grid.compare-grid-5 {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    max-width: 1100px;
+}
+
+/* Same-points clips are rendered at the source 16:9 aspect: show them whole. */
+.compare-grid-5 .clip-media {
+    aspect-ratio: 16 / 9;
+}
+
+.compare-grid-5 .clip-media video {
+    object-fit: contain;
+}
+
+.clip-media.clip-oom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+    color: #fff;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: 0.04em;
+}
+
 .compare-col-label {
     text-align: center;
     font-family: var(--font-sans);
@@ -1055,6 +1081,10 @@ table.results tbody tr:last-child td {
         grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 
+    .compare-grid.compare-grid-5 {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
     .clip-rail {
         --per-view: 2;
     }
@@ -1092,6 +1122,10 @@ table.results tbody tr:last-child td {
     .compare-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 0.5rem 0.5rem;
+    }
+
+    .compare-grid.compare-grid-5 {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
     }
 
     .plot-grid {

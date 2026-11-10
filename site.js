@@ -417,7 +417,8 @@ const setupLightbox = () => {
 
     /* Siblings of the clicked clip become the lightbox's playlist. */
     const container = figure.closest(".som-page") || figure.closest("[data-rail]") || figure.closest(".clip-grid");
-    group = container ? [...container.querySelectorAll(".clip")] : [figure];
+    /* Placeholder cells (e.g. "OOM") have no source and are skipped. */
+    group = container ? [...container.querySelectorAll(".clip")].filter(sourceOf) : [figure];
     const start = Math.max(0, group.indexOf(figure));
 
     lightbox.classList.add("is-open");
